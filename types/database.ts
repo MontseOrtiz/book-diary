@@ -64,3 +64,9 @@ export interface Database {
 }
 
 export type Book = Database["public"]["Tables"]["books"]["Row"];
+
+export const BOOK_STATUS_LABELS: Record<BookStatus, string> = {
+  quiero_leer: "Quiero leer",
+  leyendo: "Leyendo",
+  terminado: "Terminado",
+};
