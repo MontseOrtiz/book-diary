@@ -22,6 +22,45 @@ function stripMarkdownCodeFence(text: string): string {
   return fenceMatch ? fenceMatch[1].trim() : trimmed;
 }
 
+// Extracts the first balanced { ... } object, ignoring any leading/trailing
+// text or stray braces Gemini sometimes appends after the JSON itself.
+function extractFirstJsonObject(text: string): string | null {
+  const start = text.indexOf("{");
+  if (start === -1) return null;
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+
+  for (let i = start; i < text.length; i++) {
+    const char = text[i];
+
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+    } else if (char === "{") {
+      depth++;
+    } else if (char === "}") {
+      depth--;
+      if (depth === 0) {
+        return text.slice(start, i + 1);
+      }
+    }
+  }
+
+  return null;
+}
+
 const PROMPT = `You are reading a photo of a book cover.
 Identify the book's title and author from the cover and return ONLY valid JSON matching exactly this structure (no markdown, no code fences, no explanation — just the JSON):
 
@@ -101,9 +140,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Gemini no devolvió ninguna respuesta." }, { status: 502 });
   }
 
+  const jsonCandidate = extractFirstJsonObject(stripMarkdownCodeFence(responseText));
+
+  if (!jsonCandidate) {
+    console.error("No se encontró un objeto JSON en la respuesta de Gemini:", responseText);
+    return NextResponse.json(
+      { error: "Gemini devolvió una respuesta que no es JSON válido." },
+      { status: 502 }
+    );
+  }
+
   let parsed: unknown;
   try {
-    parsed = JSON.parse(stripMarkdownCodeFence(responseText));
+    parsed = JSON.parse(jsonCandidate);
   } catch {
     console.error("Gemini devolvió una respuesta que no es JSON válido:", responseText);
     return NextResponse.json(
