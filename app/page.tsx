@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { BOOK_STATUS_LABELS, type Book, type BookStatus } from "@/types/database";
+import { ReadingGoalCard } from "@/components/ReadingGoalCard";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +75,12 @@ function BookSection({ label, books }: { label: string; books: Book[] }) {
 }
 
 export default async function Home() {
-  const { data: books, error } = await supabase.from("books").select("*");
+  const currentYear = new Date().getFullYear();
+
+  const [{ data: books, error }, { data: goal }] = await Promise.all([
+    supabase.from("books").select("*"),
+    supabase.from("reading_goals").select("*").eq("year", currentYear).maybeSingle(),
+  ]);
 
   if (error) {
     return (
@@ -85,6 +91,13 @@ export default async function Home() {
       </main>
     );
   }
+
+  const finishedThisYear = (books ?? []).filter(
+    (book) =>
+      book.status === "terminado" &&
+      book.finish_date !== null &&
+      new Date(book.finish_date).getFullYear() === currentYear
+  ).length;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-10 px-6 py-12">
@@ -112,6 +125,15 @@ export default async function Home() {
             Agregar a mi lista
           </Link>
         </div>
+
+        <ReadingGoalCard year={currentYear} initialGoal={goal ?? null} finishedCount={finishedThisYear} />
+
+        <Link
+          href="/estadisticas"
+          className="self-start text-sm font-medium text-zinc-600 underline underline-offset-2 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+        >
+          Ver estadísticas completas
+        </Link>
       </div>
 
       <div className="flex flex-col gap-10">
