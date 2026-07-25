@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { Camera, Plus, ChartBar } from "@phosphor-icons/react/dist/ssr";
 import { supabase } from "@/lib/supabase";
 import { BOOK_STATUS_LABELS, type Book, type BookStatus } from "@/types/database";
 import { ReadingGoalCard } from "@/components/ReadingGoalCard";
+import { HeroBookStage } from "@/components/HeroBookStage";
 
 export const dynamic = "force-dynamic";
 
@@ -26,25 +28,23 @@ function booksForSection(status: BookStatus, books: Book[]): Book[] {
 function BookCard({ book }: { book: Book }) {
   return (
     <Link href={`/book/${book.id}`} className="group flex flex-col gap-2">
-      <div className="aspect-[2/3] w-full overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
+      <div className="aspect-[2/3] w-full overflow-hidden rounded-xl bg-surface-soft shadow-sm">
         {book.cover_image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={book.cover_image_url}
             alt={book.title}
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full items-center justify-center p-2 text-center text-xs text-zinc-400 dark:text-zinc-500">
+          <div className="flex h-full items-center justify-center p-2 text-center font-serif text-xs text-ink-soft">
             {book.title}
           </div>
         )}
       </div>
       <div>
-        <p className="line-clamp-2 text-sm font-medium text-zinc-900 dark:text-zinc-50">
-          {book.title}
-        </p>
-        <p className="line-clamp-1 text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="line-clamp-2 font-serif text-sm font-medium text-ink">{book.title}</p>
+        <p className="line-clamp-1 text-xs text-ink-soft">
           {book.author ?? "Autor desconocido"}
         </p>
       </div>
@@ -55,12 +55,10 @@ function BookCard({ book }: { book: Book }) {
 function BookSection({ label, books }: { label: string; books: Book[] }) {
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-        {label}
-      </h2>
+      <h2 className="font-serif text-xl font-medium tracking-tight text-ink">{label}</h2>
 
       {books.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-zinc-200 px-4 py-6 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+        <p className="rounded-xl border border-dashed border-ink-soft/25 bg-surface-soft/50 px-4 py-6 text-center text-sm text-ink-soft">
           Aún no tienes libros aquí.
         </p>
       ) : (
@@ -85,9 +83,7 @@ export default async function Home() {
   if (error) {
     return (
       <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 px-6 py-12">
-        <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
-          Error al cargar tus libros: {error.message}
-        </p>
+        <p className="alert-error">Error al cargar tus libros: {error.message}</p>
       </main>
     );
   }
@@ -100,40 +96,45 @@ export default async function Home() {
   ).length;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-10 px-6 py-12">
-      <div className="flex flex-col gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Mi diario de lectura
-          </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Todo lo que quieres leer, estás leyendo y ya terminaste.
-          </p>
+    <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-14 px-6 py-12">
+      <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-6">
+        <div className="flex flex-col gap-4">
+          <div>
+            <h1 className="font-serif text-4xl font-medium tracking-tight text-ink">
+              Mi diario de lectura
+            </h1>
+            <p className="mt-2 text-base text-ink-soft">
+              Todo lo que quieres leer, estás leyendo y ya terminaste.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Link href="/start-reading" className="btn-primary">
+              <Camera size={18} weight="bold" />
+              Tomar foto y empezar a leer
+            </Link>
+            <Link href="/add" className="btn-secondary">
+              <Plus size={18} weight="bold" />
+              Agregar a mi lista
+            </Link>
+          </div>
+
+          <ReadingGoalCard
+            year={currentYear}
+            initialGoal={goal ?? null}
+            finishedCount={finishedThisYear}
+          />
+
+          <Link
+            href="/estadisticas"
+            className="btn-ghost inline-flex w-fit items-center gap-1.5 no-underline"
+          >
+            <ChartBar size={16} weight="bold" />
+            <span className="underline underline-offset-2">Ver estadísticas completas</span>
+          </Link>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/start-reading"
-            className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-          >
-            Tomar foto y empezar a leer
-          </Link>
-          <Link
-            href="/add"
-            className="rounded-lg border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800"
-          >
-            Agregar a mi lista
-          </Link>
-        </div>
-
-        <ReadingGoalCard year={currentYear} initialGoal={goal ?? null} finishedCount={finishedThisYear} />
-
-        <Link
-          href="/estadisticas"
-          className="self-start text-sm font-medium text-zinc-600 underline underline-offset-2 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-        >
-          Ver estadísticas completas
-        </Link>
+        <HeroBookStage />
       </div>
 
       <div className="flex flex-col gap-10">

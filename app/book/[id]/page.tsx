@@ -3,8 +3,9 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft, PencilSimple, WarningCircle, Star } from "@phosphor-icons/react";
 import { supabase } from "@/lib/supabase";
-import { BOOK_STATUS_LABELS, type Book } from "@/types/database";
+import { BOOK_STATUS_LABELS, type Book, type BookStatus } from "@/types/database";
 
 interface CompletionForm {
   rating: number | null;
@@ -20,6 +21,12 @@ const EMPTY_FORM: CompletionForm = {
   wouldReread: null,
   engagement: null,
   notes: "",
+};
+
+const STATUS_BADGE_CLASS: Record<BookStatus, string> = {
+  quiero_leer: "badge-info",
+  leyendo: "badge-warning",
+  terminado: "badge-success",
 };
 
 function formatDate(value: string | null): string | null {
@@ -43,10 +50,10 @@ function YesNoToggle({
       <button
         type="button"
         onClick={() => onChange(true)}
-        className={`rounded-lg border px-4 py-1.5 text-sm font-medium transition-colors ${
+        className={`rounded-xl border px-4 py-1.5 text-sm font-medium transition-colors ${
           value === true
-            ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-            : "border-zinc-300 text-zinc-900 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800"
+            ? "border-primary bg-primary text-surface"
+            : "border-ink-soft/25 text-ink hover:bg-surface-soft"
         }`}
       >
         Sí
@@ -54,10 +61,10 @@ function YesNoToggle({
       <button
         type="button"
         onClick={() => onChange(false)}
-        className={`rounded-lg border px-4 py-1.5 text-sm font-medium transition-colors ${
+        className={`rounded-xl border px-4 py-1.5 text-sm font-medium transition-colors ${
           value === false
-            ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-            : "border-zinc-300 text-zinc-900 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800"
+            ? "border-primary bg-primary text-surface"
+            : "border-ink-soft/25 text-ink hover:bg-surface-soft"
         }`}
       >
         No
@@ -84,12 +91,22 @@ function ScaleSelector({
           onClick={() => onChange(n)}
           className={`flex h-9 w-9 items-center justify-center rounded-full border text-sm font-medium transition-colors ${
             value !== null && n <= value
-              ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-              : "border-zinc-300 text-zinc-500 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              ? "border-primary bg-primary text-surface"
+              : "border-ink-soft/25 text-ink-soft hover:bg-surface-soft"
           }`}
         >
-          {symbol === "star" ? "★" : n}
+          {symbol === "star" ? <Star size={14} weight="fill" /> : n}
         </button>
+      ))}
+    </div>
+  );
+}
+
+function RatingStars({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-0.5 text-accent">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <Star key={n} size={16} weight={n <= rating ? "fill" : "regular"} />
       ))}
     </div>
   );
@@ -246,16 +263,18 @@ export default function BookDetailPage() {
     setShowForm(false);
   }
 
+  const backLink = (
+    <Link href="/" className="btn-ghost inline-flex w-fit items-center gap-1.5 no-underline">
+      <ArrowLeft size={14} weight="bold" />
+      <span className="underline underline-offset-2">Volver al inicio</span>
+    </Link>
+  );
+
   if (loading) {
     return (
       <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-6 py-12">
-        <Link
-          href="/"
-          className="self-start text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-        >
-          ← Volver al inicio
-        </Link>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Cargando...</p>
+        {backLink}
+        <p className="text-sm text-ink-soft">Cargando...</p>
       </main>
     );
   }
@@ -263,13 +282,8 @@ export default function BookDetailPage() {
   if (notFound) {
     return (
       <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-6 py-12">
-        <Link
-          href="/"
-          className="self-start text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-        >
-          ← Volver al inicio
-        </Link>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Libro no encontrado.</p>
+        {backLink}
+        <p className="text-sm text-ink-soft">Libro no encontrado.</p>
       </main>
     );
   }
@@ -277,13 +291,9 @@ export default function BookDetailPage() {
   if (!book) {
     return (
       <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-6 py-12">
-        <Link
-          href="/"
-          className="self-start text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-        >
-          ← Volver al inicio
-        </Link>
-        <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
+        {backLink}
+        <p className="alert-error">
+          <WarningCircle size={18} weight="fill" className="mt-0.5 shrink-0 text-error" />
           {errorMessage ?? "Error al cargar el libro."}
         </p>
       </main>
@@ -295,21 +305,17 @@ export default function BookDetailPage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-6 py-12">
-      <Link
-        href="/"
-        className="self-start text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-      >
-        ← Volver al inicio
-      </Link>
+      {backLink}
 
       {errorMessage && (
-        <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
+        <p className="alert-error">
+          <WarningCircle size={18} weight="fill" className="mt-0.5 shrink-0 text-error" />
           {errorMessage}
         </p>
       )}
 
       <div className="flex gap-5">
-        <div className="h-44 w-32 flex-shrink-0 overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
+        <div className="h-44 w-32 flex-shrink-0 overflow-hidden rounded-xl bg-surface-soft shadow-sm">
           {book.cover_image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -318,7 +324,7 @@ export default function BookDetailPage() {
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full items-center justify-center p-2 text-center text-xs text-zinc-400 dark:text-zinc-500">
+            <div className="flex h-full items-center justify-center p-2 text-center font-serif text-xs text-ink-soft">
               {book.title}
             </div>
           )}
@@ -326,27 +332,23 @@ export default function BookDetailPage() {
 
         <div className="flex flex-col gap-2">
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <h1 className="font-serif text-xl font-medium tracking-tight text-ink">
               {book.title}
             </h1>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {book.author ?? "Autor desconocido"}
-            </p>
+            <p className="text-sm text-ink-soft">{book.author ?? "Autor desconocido"}</p>
           </div>
 
-          <span className="w-fit rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+          <span
+            className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${STATUS_BADGE_CLASS[book.status]}`}
+          >
             {BOOK_STATUS_LABELS[book.status]}
           </span>
 
           {startDateLabel && (
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Empezado: {startDateLabel}
-            </p>
+            <p className="text-xs text-ink-soft">Empezado: {startDateLabel}</p>
           )}
           {finishDateLabel && (
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Terminado: {finishDateLabel}
-            </p>
+            <p className="text-xs text-ink-soft">Terminado: {finishDateLabel}</p>
           )}
         </div>
       </div>
@@ -356,7 +358,7 @@ export default function BookDetailPage() {
           type="button"
           onClick={handleStartReading}
           disabled={updating}
-          className="self-start rounded-lg bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          className="btn-primary self-start"
         >
           {updating ? "Guardando..." : "Empezar a leer"}
         </button>
@@ -368,80 +370,64 @@ export default function BookDetailPage() {
             type="button"
             onClick={handleLogProgress}
             disabled={updating}
-            className="rounded-lg border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800"
+            className="btn-secondary"
           >
             {updating ? "Guardando..." : "Actualicé mi avance hoy"}
           </button>
-          <button
-            type="button"
-            onClick={openCompletionForm}
-            className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-          >
+          <button type="button" onClick={openCompletionForm} className="btn-primary">
             Marcar como terminado
           </button>
         </div>
       )}
 
       {book.status === "terminado" && !showForm && (
-        <div className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+        <div className="card-surface flex flex-col gap-3 p-4">
           <div>
-            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Calificación</p>
-            <p className="text-sm text-zinc-900 dark:text-zinc-50">
-              {book.rating ? "★".repeat(book.rating) + "☆".repeat(5 - book.rating) : "Sin calificar"}
+            <p className="text-xs font-medium text-ink-soft">Calificación</p>
+            {book.rating ? (
+              <RatingStars rating={book.rating} />
+            ) : (
+              <p className="text-sm text-ink">Sin calificar</p>
+            )}
+          </div>
+          <div>
+            <p className="text-xs font-medium text-ink-soft">¿Lo recomendarías?</p>
+            <p className="text-sm text-ink">
+              {book.would_recommend === null ? "Sin respuesta" : book.would_recommend ? "Sí" : "No"}
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              ¿Lo recomendarías?
-            </p>
-            <p className="text-sm text-zinc-900 dark:text-zinc-50">
-              {book.would_recommend === null ? "—" : book.would_recommend ? "Sí" : "No"}
+            <p className="text-xs font-medium text-ink-soft">¿Lo volverías a leer?</p>
+            <p className="text-sm text-ink">
+              {book.would_reread === null ? "Sin respuesta" : book.would_reread ? "Sí" : "No"}
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              ¿Lo volverías a leer?
-            </p>
-            <p className="text-sm text-zinc-900 dark:text-zinc-50">
-              {book.would_reread === null ? "—" : book.would_reread ? "Sí" : "No"}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              ¿Qué tan enganchada estuviste?
-            </p>
-            <p className="text-sm text-zinc-900 dark:text-zinc-50">
-              {book.engagement ?? "—"} / 5
-            </p>
+            <p className="text-xs font-medium text-ink-soft">¿Qué tan enganchada estuviste?</p>
+            <p className="text-sm text-ink">{book.engagement ?? "Sin respuesta"} / 5</p>
           </div>
           {book.notes && (
             <div>
-              <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Notas</p>
-              <p className="whitespace-pre-wrap text-sm text-zinc-900 dark:text-zinc-50">
-                {book.notes}
-              </p>
+              <p className="text-xs font-medium text-ink-soft">Notas</p>
+              <p className="whitespace-pre-wrap text-sm text-ink">{book.notes}</p>
             </div>
           )}
 
           <button
             type="button"
             onClick={openEditForm}
-            className="self-start text-sm font-medium text-zinc-600 underline underline-offset-2 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="btn-ghost inline-flex w-fit items-center gap-1"
           >
+            <PencilSimple size={14} weight="bold" />
             Editar
           </button>
         </div>
       )}
 
       {showForm && (
-        <form
-          onSubmit={handleSubmitForm}
-          className="flex flex-col gap-5 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
-        >
+        <form onSubmit={handleSubmitForm} className="card-surface flex flex-col gap-5 p-4">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-              Calificación
-            </label>
+            <label className="text-sm font-medium text-ink">Calificación</label>
             <ScaleSelector
               value={form.rating}
               onChange={(rating) => setForm((f) => ({ ...f, rating }))}
@@ -450,9 +436,7 @@ export default function BookDetailPage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-              ¿Lo recomendarías?
-            </label>
+            <label className="text-sm font-medium text-ink">¿Lo recomendarías?</label>
             <YesNoToggle
               value={form.wouldRecommend}
               onChange={(wouldRecommend) => setForm((f) => ({ ...f, wouldRecommend }))}
@@ -460,9 +444,7 @@ export default function BookDetailPage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-              ¿Lo volverías a leer?
-            </label>
+            <label className="text-sm font-medium text-ink">¿Lo volverías a leer?</label>
             <YesNoToggle
               value={form.wouldReread}
               onChange={(wouldReread) => setForm((f) => ({ ...f, wouldReread }))}
@@ -470,7 +452,7 @@ export default function BookDetailPage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            <label className="text-sm font-medium text-ink">
               ¿Qué tan enganchada estuviste?
             </label>
             <ScaleSelector
@@ -480,36 +462,29 @@ export default function BookDetailPage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-              Notas <span className="font-normal text-zinc-500 dark:text-zinc-400">(opcional)</span>
+            <label className="text-sm font-medium text-ink">
+              Notas <span className="font-normal text-ink-soft">(opcional)</span>
             </label>
             <textarea
               value={form.notes}
               onChange={(event) => setForm((f) => ({ ...f, notes: event.target.value }))}
               rows={4}
-              className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+              className="input-field resize-none"
             />
           </div>
 
           {formError && (
-            <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
+            <p className="alert-error">
+              <WarningCircle size={18} weight="fill" className="mt-0.5 shrink-0 text-error" />
               {formError}
             </p>
           )}
 
           <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={updating}
-              className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-            >
+            <button type="submit" disabled={updating} className="btn-primary">
               {updating ? "Guardando..." : "Guardar"}
             </button>
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="rounded-lg border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800"
-            >
+            <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">
               Cancelar
             </button>
           </div>

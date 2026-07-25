@@ -1,26 +1,87 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #7c4a57;
+  --secondary: #6b8f71;
+  --accent: #d4a24e;
+  --background: #fbf6ee;
+  --surface: #ffffff;
+  --surface-soft: #f6efe3;
+  --text-primary: #3a2e2c;
+  --text-secondary: #7a6a63;
+  --success: #7fa98c;
+  --warning: #e0b15c;
+  --error: #c1666b;
+  --info: #7a93a8;
 }
 
+/* Bridges the raw palette above into Tailwind v4's theme so utilities like
+   bg-primary, text-ink, border-surface-soft are generated automatically.
+   "ink" / "ink-soft" avoid the awkward text-text-primary utility name. */
 @theme inline {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-surface: var(--surface);
+  --color-surface-soft: var(--surface-soft);
+  --color-ink: var(--text-primary);
+  --color-ink-soft: var(--text-secondary);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-serif: var(--font-newsreader);
+  --font-sans: var(--font-work-sans);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-surface transition-all hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-primary/25 bg-surface px-5 py-2.5 text-sm font-medium text-ink transition-all hover:bg-surface-soft active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply text-sm font-medium text-ink-soft underline underline-offset-2 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .card-surface {
+    @apply rounded-xl border border-ink-soft/15 bg-surface;
+  }
+
+  .input-field {
+    @apply rounded-xl border border-ink-soft/25 bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20;
+  }
+
+  /* Semantic colors (info/accent/success) fail WCAG AA as raw text on light
+     surfaces, so badges carry meaning via a tinted background + border and
+     keep body text on --color-ink for contrast. */
+  .badge-info {
+    @apply border border-info/40 bg-info/15 text-ink;
+  }
+
+  .badge-warning {
+    @apply border border-accent/40 bg-accent/15 text-ink;
+  }
+
+  .badge-success {
+    @apply border border-success/40 bg-success/20 text-ink;
+  }
+
+  .alert-error {
+    @apply flex items-start gap-2 rounded-xl border-l-4 border-error bg-error/10 px-4 py-2.5 text-sm text-ink;
+  }
+
+  .alert-success {
+    @apply flex items-start gap-2 rounded-xl border-l-4 border-success bg-success/10 px-4 py-2.5 text-sm text-ink;
+  }
 }
