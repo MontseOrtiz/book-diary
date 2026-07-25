@@ -57,6 +57,27 @@ export interface Database {
         };
         Relationships: [];
       };
+      reading_goals: {
+        Row: {
+          id: string;
+          year: number;
+          target_count: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          year: number;
+          target_count: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          year?: number;
+          target_count?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -64,6 +85,7 @@ export interface Database {
 }
 
 export type Book = Database["public"]["Tables"]["books"]["Row"];
+export type ReadingGoal = Database["public"]["Tables"]["reading_goals"]["Row"];
 
 export const BOOK_STATUS_LABELS: Record<BookStatus, string> = {
   quiero_leer: "Quiero leer",
