@@ -1,6 +1,13 @@
 "use client";
 
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  Camera,
+  MagnifyingGlass,
+  CheckCircle,
+  WarningCircle,
+  ArrowLeft,
+} from "@phosphor-icons/react";
 import { supabase } from "@/lib/supabase";
 import type { BookSearchResult } from "@/app/api/search-books/route";
 
@@ -139,22 +146,24 @@ export default function StartReadingPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-6 py-12">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="font-serif text-3xl font-medium tracking-tight text-ink">
           Empezar a leer
         </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-ink-soft">
           Toma una foto de la portada o busca el libro manualmente.
         </p>
       </div>
 
       {successMessage && (
-        <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+        <p className="alert-success">
+          <CheckCircle size={18} weight="fill" className="mt-0.5 shrink-0 text-success" />
           {successMessage}
         </p>
       )}
 
       {errorMessage && (
-        <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
+        <p className="alert-error">
+          <WarningCircle size={18} weight="fill" className="mt-0.5 shrink-0 text-error" />
           {errorMessage}
         </p>
       )}
@@ -167,7 +176,7 @@ export default function StartReadingPage() {
             accept="image/*"
             capture="environment"
             onChange={handleFileChange}
-            className="text-sm text-zinc-600 file:mr-4 file:rounded-lg file:border-0 file:bg-zinc-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-zinc-900 hover:file:bg-zinc-200 dark:text-zinc-400 dark:file:bg-zinc-800 dark:file:text-zinc-50 dark:hover:file:bg-zinc-700"
+            className="text-sm text-ink-soft file:mr-4 file:rounded-xl file:border-0 file:bg-surface-soft file:px-4 file:py-2 file:text-sm file:font-medium file:text-ink hover:file:bg-surface-soft/70"
           />
 
           <div className="flex gap-2">
@@ -175,8 +184,9 @@ export default function StartReadingPage() {
               type="button"
               onClick={handleAnalyzePhoto}
               disabled={!selectedFile || analyzing}
-              className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+              className="btn-primary"
             >
+              <Camera size={18} weight="bold" />
               {analyzing ? "Leyendo la portada..." : "Analizar portada"}
             </button>
           </div>
@@ -187,7 +197,7 @@ export default function StartReadingPage() {
               setCaptureMode("manual");
               setErrorMessage(null);
             }}
-            className="self-start text-sm font-medium text-zinc-600 underline underline-offset-2 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="btn-ghost self-start"
           >
             Buscar manualmente
           </button>
@@ -201,13 +211,10 @@ export default function StartReadingPage() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Ej. Harry Potter"
-            className="flex-1 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+            className="input-field flex-1"
           />
-          <button
-            type="submit"
-            disabled={searching}
-            className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-          >
+          <button type="submit" disabled={searching} className="btn-primary">
+            <MagnifyingGlass size={18} weight="bold" />
             {searching ? "Buscando..." : "Buscar"}
           </button>
         </form>
@@ -217,28 +224,23 @@ export default function StartReadingPage() {
         <>
           <ul className="flex flex-col gap-3">
             {results.map((book) => (
-              <li
-                key={book.open_library_id}
-                className="flex items-center gap-4 rounded-lg border border-zinc-200 p-3 dark:border-zinc-800"
-              >
+              <li key={book.open_library_id} className="card-surface flex items-center gap-4 p-3">
                 {book.cover_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={book.cover_url}
                     alt={book.title}
-                    className="h-20 w-14 flex-shrink-0 rounded object-cover"
+                    className="h-20 w-14 flex-shrink-0 rounded-lg object-cover"
                   />
                 ) : (
-                  <div className="flex h-20 w-14 flex-shrink-0 items-center justify-center rounded bg-zinc-100 text-center text-[10px] text-zinc-400 dark:bg-zinc-800">
+                  <div className="flex h-20 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-surface-soft text-center text-[10px] text-ink-soft">
                     Sin portada
                   </div>
                 )}
 
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                    {book.title}
-                  </p>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  <p className="font-serif text-sm font-medium text-ink">{book.title}</p>
+                  <p className="text-sm text-ink-soft">
                     {book.author ?? "Autor desconocido"}
                   </p>
                 </div>
@@ -247,7 +249,7 @@ export default function StartReadingPage() {
                   type="button"
                   onClick={() => handleConfirm(book)}
                   disabled={savingId === book.open_library_id}
-                  className="flex-shrink-0 rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-900 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  className="btn-secondary flex-shrink-0 px-3 py-1.5 text-xs"
                 >
                   {savingId === book.open_library_id
                     ? "Guardando..."
@@ -258,16 +260,13 @@ export default function StartReadingPage() {
           </ul>
 
           {searchedAtLeastOnce && results.length === 0 && (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-ink-soft">
               No se encontraron resultados. Intenta con otro título o autor.
             </p>
           )}
 
-          <button
-            type="button"
-            onClick={resetToStart}
-            className="self-start text-sm font-medium text-zinc-600 underline underline-offset-2 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-          >
+          <button type="button" onClick={resetToStart} className="btn-ghost inline-flex w-fit items-center gap-1.5">
+            <ArrowLeft size={14} weight="bold" />
             Empezar de nuevo
           </button>
         </>

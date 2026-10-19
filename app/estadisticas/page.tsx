@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { supabase } from "@/lib/supabase";
 import type { Book } from "@/types/database";
 
@@ -41,7 +42,7 @@ function countByKey(books: Book[], keyOf: (finishDate: Date) => string): Map<str
 function StatList({ rows }: { rows: { label: string; count: number }[] }) {
   if (rows.length === 0) {
     return (
-      <p className="rounded-lg border border-dashed border-zinc-200 px-4 py-6 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+      <p className="rounded-xl border border-dashed border-ink-soft/25 bg-surface-soft/50 px-4 py-6 text-center text-sm text-ink-soft">
         Aún no hay libros terminados.
       </p>
     );
@@ -50,18 +51,18 @@ function StatList({ rows }: { rows: { label: string; count: number }[] }) {
   const maxCount = Math.max(...rows.map((row) => row.count));
 
   return (
-    <ul className="flex flex-col gap-2">
+    <ul className="flex flex-col gap-3">
       {rows.map((row) => (
-        <li key={row.label} className="flex flex-col gap-1">
+        <li key={row.label} className="card-surface flex flex-col gap-2 p-3">
           <div className="flex items-baseline justify-between gap-2 text-sm">
-            <span className="text-zinc-900 dark:text-zinc-50">{row.label}</span>
-            <span className="text-zinc-500 dark:text-zinc-400">
+            <span className="font-serif text-ink">{row.label}</span>
+            <span className="text-ink-soft">
               {row.count} {row.count === 1 ? "libro" : "libros"}
             </span>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-soft">
             <div
-              className="h-full rounded-full bg-zinc-900 dark:bg-zinc-100"
+              className="h-full rounded-full bg-primary"
               style={{ width: `${(row.count / maxCount) * 100}%` }}
             />
           </div>
@@ -81,9 +82,7 @@ export default async function EstadisticasPage() {
   if (error) {
     return (
       <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-6 py-12">
-        <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
-          Error al cargar las estadísticas: {error.message}
-        </p>
+        <p className="alert-error">Error al cargar las estadísticas: {error.message}</p>
       </main>
     );
   }
@@ -125,40 +124,30 @@ export default async function EstadisticasPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-10 px-6 py-12">
       <div className="flex flex-col gap-4">
-        <Link
-          href="/"
-          className="self-start text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-        >
-          ← Volver al inicio
+        <Link href="/" className="btn-ghost inline-flex w-fit items-center gap-1.5 no-underline">
+          <ArrowLeft size={14} weight="bold" />
+          <span className="underline underline-offset-2">Volver al inicio</span>
         </Link>
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className="font-serif text-3xl font-medium tracking-tight text-ink">
             Estadísticas
           </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Un resumen de los libros que has terminado.
-          </p>
+          <p className="mt-1 text-sm text-ink-soft">Un resumen de los libros que has terminado.</p>
         </div>
       </div>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Por año
-        </h2>
+        <h2 className="font-serif text-xl font-medium tracking-tight text-ink">Por año</h2>
         <StatList rows={yearRows} />
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Por mes
-        </h2>
+        <h2 className="font-serif text-xl font-medium tracking-tight text-ink">Por mes</h2>
         <StatList rows={monthRows} />
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Por semana
-        </h2>
+        <h2 className="font-serif text-xl font-medium tracking-tight text-ink">Por semana</h2>
         <StatList rows={weekRows} />
       </section>
     </main>
