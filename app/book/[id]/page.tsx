@@ -89,13 +89,17 @@ function ScaleSelector({
           key={n}
           type="button"
           onClick={() => onChange(n)}
+          aria-label={symbol === "star" ? `${n} de 5 estrellas` : undefined}
+          aria-pressed={value === n}
           className={`flex h-9 w-9 items-center justify-center rounded-full border text-sm font-medium transition-colors ${
             value !== null && n <= value
               ? "border-primary bg-primary text-surface"
               : "border-ink-soft/25 text-ink-soft hover:bg-surface-soft"
           }`}
         >
-          {symbol === "star" ? <Star size={14} weight="fill" /> : n}
+          {symbol === "star" ? (
+            <Star size={14} weight="fill" aria-hidden="true" focusable="false" />
+          ) : n}
         </button>
       ))}
     </div>
@@ -105,8 +109,15 @@ function ScaleSelector({
 function RatingStars({ rating }: { rating: number }) {
   return (
     <div className="flex gap-0.5 text-accent">
+      <span className="sr-only">Calificación: {rating} de 5 estrellas</span>
       {[1, 2, 3, 4, 5].map((n) => (
-        <Star key={n} size={16} weight={n <= rating ? "fill" : "regular"} />
+        <Star
+          key={n}
+          size={16}
+          weight={n <= rating ? "fill" : "regular"}
+          aria-hidden="true"
+          focusable="false"
+        />
       ))}
     </div>
   );
