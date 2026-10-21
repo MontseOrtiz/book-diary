@@ -5,30 +5,40 @@ import { saveGoal } from "@/app/actions";
 import { signOut } from "@/app/login/actions";
 import { LibraryTree } from "./LibraryTree";
 
-function GoalRing({ completed, target }: { completed: number; target: number }) {
-  const radius = 28;
-  const circumference = 2 * Math.PI * radius;
-  const fraction = Math.min(1, completed / target);
+function GoalIcon() {
   return (
-    <div className="flex items-center gap-4">
-      <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true">
-        <circle cx="36" cy="36" r={radius} fill="none" strokeWidth="6" className="stroke-surface-soft" />
-        <circle
-          cx="36"
-          cy="36"
-          r={radius}
-          fill="none"
-          strokeWidth="6"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={circumference * (1 - fraction)}
-          transform="rotate(-90 36 36)"
-          className="stroke-primary"
-        />
-      </svg>
-      <p className="text-lg">
-        {completed} de {target} libros
-      </p>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0 text-primary">
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="1.2" fill="currentColor" />
+    </svg>
+  );
+}
+
+function GoalBox({ year, completed, target }: { year: number; completed: number; target: number | null }) {
+  const percent = target ? Math.min(100, Math.round((completed / target) * 100)) : 0;
+  return (
+    <div className="mx-auto inline-flex items-center gap-4 rounded-xl border border-solid border-ink-soft/40 bg-surface px-5 py-3">
+      <GoalIcon />
+      <div className="flex flex-col">
+        <span className="text-sm font-medium">Meta {year}</span>
+        <span className="text-sm text-ink-soft">
+          {target ? `${completed} de ${target} libros` : "Sin meta establecida"}
+        </span>
+      </div>
+      {target && (
+        <div
+          role="progressbar"
+          aria-label={`Progreso de la meta ${year}`}
+          aria-valuemin={0}
+          aria-valuemax={target}
+          aria-valuenow={Math.min(completed, target)}
+          className="h-2.5 w-32 overflow-hidden rounded-full bg-surface-soft sm:w-48"
+        >
+          <div className="h-full rounded-full bg-primary" style={{ width: `${percent}%` }} />
+        </div>
+      )}
     </div>
   );
 }
@@ -52,7 +62,7 @@ export function Library({
 
   return (
     <div className="flex flex-col gap-10">
-      <nav aria-label="Año" className="flex gap-2 overflow-x-auto pb-1">
+      <nav aria-label="Año" className="flex justify-center gap-2 overflow-x-auto pb-1">
         {view.years.map((year) => (
           <Link
             key={year}
@@ -69,26 +79,11 @@ export function Library({
         ))}
       </nav>
 
+      <div className="flex justify-center">
+        <GoalBox year={view.year} completed={view.completed} target={view.goal?.target_count ?? null} />
+      </div>
       {owner && (
-        <div className="flex items-center gap-4">
-          <Link href="/libros/nuevo" className="btn-primary">
-            Agregar libro
-          </Link>
-          <form action={signOut}>
-            <button type="submit" className="btn-ghost">
-              Salir
-            </button>
-          </form>
-        </div>
-      )}
-
-      {view.goal ? (
-        <GoalRing completed={view.completed} target={view.goal.target_count} />
-      ) : (
-        <p className="text-ink-soft">Sin meta establecida</p>
-      )}
-      {owner && (
-        <form action={saveGoal} className="flex items-end gap-2">
+        <form action={saveGoal} className="flex items-end justify-center gap-2">
           <input type="hidden" name="year" value={view.year} />
           <label className="flex flex-col gap-1 text-sm">
             Meta {view.year}
@@ -99,6 +94,19 @@ export function Library({
             Guardar meta
           </button>
         </form>
+      )}
+
+      {owner && (
+        <div className="flex items-center justify-center gap-4">
+          <Link href="/libros/nuevo" className="btn-primary">
+            Agregar libro
+          </Link>
+          <form action={signOut}>
+            <button type="submit" className="btn-ghost">
+              Salir
+            </button>
+          </form>
+        </div>
       )}
 
       <LibraryTree

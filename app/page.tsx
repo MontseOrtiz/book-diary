@@ -24,7 +24,7 @@ export default async function Home({
       </a>
       <LandingSequence />
       <main id="biblioteca" tabIndex={-1} className="mx-auto w-full max-w-6xl px-4 py-24">
-        <h2 className="mb-8 font-serif text-4xl">Biblioteca</h2>
+        <h2 className="mb-8 text-center font-serif text-4xl">Mis años de lectura</h2>
         <Library
           owner={owner}
           result={result}

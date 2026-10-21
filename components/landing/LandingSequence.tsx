@@ -44,7 +44,7 @@ function StaticLanding() {
   return (
     <section
       aria-label="Introducción"
-      className="relative flex h-screen flex-col items-center justify-start bg-[url(/landing/facade.svg)] bg-cover bg-center px-4 py-10 text-center"
+      className="relative flex h-screen flex-col items-center justify-start bg-[url(/landing/book-store-hero.png)] bg-cover bg-center px-4 py-10 text-center"
     >
       <h1 className="sr-only">Book Diary</h1>
       <a href="#biblioteca" className="btn-primary">
