@@ -267,7 +267,7 @@ export function LibraryTree({
             <div className="flex flex-col gap-8">{[6, 7, 8, 9, 10, 11].map((i) => monthShelf(i, "right"))}</div>
           </div>
         </div>
-        <div aria-hidden="true" className="hidden h-52 md:block" />
+        <div aria-hidden="true" className="hidden h-6 md:block" />
       </div>
 
       {noMonth.length > 0 && (

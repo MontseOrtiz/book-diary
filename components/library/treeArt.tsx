@@ -207,7 +207,7 @@ function trunkCenter(cx: number, y: number) {
 }
 
 function renderTree(geo: TreeGeo) {
-  const { cx, trunkTop, trunkBottom, height, shelves } = geo;
+  const { cx, trunkTop, trunkBottom, shelves } = geo;
   const paths: React.ReactNode[] = [];
   const pieces: Piece[] = [];
 
@@ -222,8 +222,14 @@ function renderTree(geo: TreeGeo) {
     left.push([c - w / 2, y]);
     right.push([c + w / 2, y]);
   }
+  const bottomL = left[left.length - 1];
+  const bottomR = right[right.length - 1];
+  const cap: Pt[] = Array.from({ length: 9 }, (_, i) => {
+    const t = i / 8;
+    return [lerp(bottomR[0], bottomL[0], t), bottomR[1] + Math.sin(t * Math.PI) * 12];
+  });
   paths.push(
-    <path key="trunk" d={`M${[...left, ...right.reverse()].map(fmt).join("L")}Z`} fill="url(#bark)" />,
+    <path key="trunk" d={`M${[...left, ...cap, ...right.reverse().slice(1)].map(fmt).join("L")}Z`} fill="url(#bark)" />,
   );
   for (const f of [-0.32, -0.1, 0.14, 0.33]) {
     const line: Pt[] = [];
@@ -242,35 +248,6 @@ function renderTree(geo: TreeGeo) {
         strokeLinecap="round"
       />,
     );
-  }
-
-  // --- Raíces ---
-  const rootRand = rng(77);
-  const rootsH = Math.max(60, height - trunkBottom);
-  const rootCount = 7;
-  for (let k = 0; k < rootCount; k++) {
-    const dirn = (k - (rootCount - 1) / 2) / ((rootCount - 1) / 2);
-    const start: Pt = [trunkCenter(cx, trunkBottom) + dirn * 34, trunkBottom - 18];
-    const reach = lerp(40, Math.min(cx - 30, 230), Math.abs(dirn) ** 0.7);
-    const end: Pt = [cx + Math.sign(dirn || 1) * reach * (Math.abs(dirn) < 0.01 ? 0.2 : 1), trunkBottom + rootsH * lerp(0.95, 0.55, Math.abs(dirn))];
-    const pts = bezier(
-      start,
-      [start[0] + dirn * 10, start[1] + rootsH * 0.45],
-      [end[0] - dirn * 70, end[1] - rootsH * 0.25 + rootRand() * 14],
-      end,
-    );
-    paths.push(
-      <path key={`root${k}`} d={taper(pts, 26 - Math.abs(dirn) * 8, 2)} fill={BARK} stroke={BARK_DARK} strokeWidth="0.6" />,
-    );
-    const mid = pts[Math.floor(pts.length * 0.55)];
-    const sub = bezier(
-      mid,
-      [mid[0] + dirn * 20, mid[1] + 8],
-      [mid[0] + dirn * 45, mid[1] + 14],
-      [mid[0] + dirn * (50 + rootRand() * 30), mid[1] + 28 + rootRand() * 16],
-      14,
-    );
-    paths.push(<path key={`sroot${k}`} d={taper(sub, 6, 1)} fill={BARK} />);
   }
 
   // --- Ramas ---

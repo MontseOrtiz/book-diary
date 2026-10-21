@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 
 // Three.js/WebGL cannot render on the server, so the scene is loaded client-only.
 const LandingCanvas = dynamic(
@@ -39,13 +39,14 @@ function smooth(from: number, to: number, value: number) {
   return t * t * (3 - 2 * t);
 }
 
+// Hero final: la librería con su letrero. El título visible es el de la fachada.
 function StaticLanding() {
   return (
     <section
       aria-label="Introducción"
-      className="relative flex min-h-screen flex-col items-center justify-between bg-[url(/landing/facade.svg)] bg-cover bg-bottom px-4 py-16 text-center"
+      className="relative flex h-screen flex-col items-center justify-start bg-[url(/landing/facade.svg)] bg-cover bg-center px-4 py-10 text-center"
     >
-      <h1 className="font-serif text-6xl text-ink sm:text-8xl">Book Diary</h1>
+      <h1 className="sr-only">Book Diary</h1>
       <a href="#biblioteca" className="btn-primary">
         Entrar a la biblioteca
       </a>
@@ -53,7 +54,7 @@ function StaticLanding() {
   );
 }
 
-function AnimatedLanding() {
+function AnimatedLanding({ onDone }: { onDone: () => void }) {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
@@ -67,6 +68,11 @@ function AnimatedLanding() {
       const rect = section.getBoundingClientRect();
       const total = rect.height - window.innerHeight;
       const p = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
+      // Al pasar por completo la secuencia, ya no vuelve a animarse.
+      if (rect.bottom <= 0) {
+        onDone();
+        return;
+      }
       progress.current = p;
       if (titleRef.current) titleRef.current.style.opacity = String(1 - smooth(0.06, 0.26, p));
       if (hintRef.current) hintRef.current.style.opacity = String(1 - smooth(0.02, 0.1, p));
@@ -80,7 +86,7 @@ function AnimatedLanding() {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [onDone]);
 
   return (
     <section ref={sectionRef} aria-label="Introducción" className="relative h-[500vh]">
@@ -126,6 +132,23 @@ export function LandingSequence() {
     hasWebGL,
     () => true,
   );
+  // La animación corre una sola vez por carga: al dejarla atrás se reemplaza por
+  // el hero estático, conservando la posición de la biblioteca en pantalla.
+  const [played, setPlayed] = useState(false);
+  const anchorTop = useRef<number | null>(null);
 
-  return reducedMotion || !webgl ? <StaticLanding /> : <AnimatedLanding />;
+  function finish() {
+    if (played) return;
+    anchorTop.current = document.getElementById("biblioteca")?.getBoundingClientRect().top ?? null;
+    setPlayed(true);
+  }
+
+  useLayoutEffect(() => {
+    if (!played || anchorTop.current === null) return;
+    const now = document.getElementById("biblioteca")?.getBoundingClientRect().top;
+    if (now !== undefined && now !== anchorTop.current) window.scrollBy(0, now - anchorTop.current);
+    anchorTop.current = null;
+  }, [played]);
+
+  return reducedMotion || !webgl || played ? <StaticLanding /> : <AnimatedLanding onDone={finish} />;
 }

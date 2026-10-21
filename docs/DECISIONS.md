@@ -363,6 +363,16 @@ La propietaria declara que los registros de v1 en Supabase **eran solo pruebas, 
 
 **Pendiente de aprobar:** esta distribución, la mecánica del panel y los límites. Si no te convence, se ajusta sin tocar datos ni esquema.
 
+### DEC-051 — Animación de entrada una sola vez y ramas ancladas a los bordes (ajusta DEC-017 y DEC-047)
+**Estado:** APROBADA · **Fecha de aprobación:** 21/10/2026
+
+1. **Una sola vez:** la secuencia hero → fachada → puerta se anima solo en el primer recorrido tras cargar la página. Al dejarla atrás y volver arriba, el hero queda como la **librería estática** (fachada con su letrero, sin ramas ni animación). Al recargar, vuelve a animarse. Esto sustituye la reversibilidad con el scroll de DEC-017.
+2. **Ramas de cerezo:** al inicio quedan **pegadas a los bordes izquierdo y derecho**; al hacer scroll se abren hacia afuera pero **siguen ancladas a los bordes**, sin salir de la pantalla ni cambiar de tamaño, sea cual sea la cantidad de scroll o el tamaño de la ventana.
+3. **Acercamiento a la puerta (DEC-018):** se mantiene.
+4. **Árbol de la biblioteca (DEC-050):** se quitan las raíces.
+
+**Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
+
 ## 6. Decisiones todavía pendientes (no aprobadas)
 
 Estado vigente al **19/10/2026**: ninguna OPEN/TECH se cierra por completo. DEC-033–DEC-041 resuelven subreglas concretas; las partes restantes siguen pendientes y bloquean solo las tareas que dependen de ellas:

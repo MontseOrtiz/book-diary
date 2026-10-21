@@ -9,7 +9,6 @@ const CAM_FOV = 35;
 const CAM_END_Z = 3;
 const FACADE_ASPECT = 1.6;
 const BRANCH_ASPECT = 0.9;
-const BRANCH_Z = 1.2;
 // Vertical center of the door in the facade art, as a fraction of its height below the center.
 const DOOR_OFFSET = 0.285;
 
@@ -18,8 +17,18 @@ function smooth(from: number, to: number, value: number) {
   return t * t * (3 - 2 * t);
 }
 
+// Distancia delante de la cámara a la que viven las ramas: constante, así que
+// su tamaño en pantalla no cambia aunque la cámara avance hacia la puerta.
+const OVERLAY_DIST = 6.8;
+const BRANCH_REMAIN = 0.6; // fracción de la rama que sigue visible al abrirse
+
+function visibleSize(distance: number, aspect: number) {
+  const height = 2 * distance * Math.tan((CAM_FOV * Math.PI) / 360);
+  return { width: height * aspect, height };
+}
+
 function Scene({ progress }: { progress: MutableRefObject<number> }) {
-  const viewport = useThree((state) => state.viewport);
+  const size = useThree((state) => state.size);
   const [facadeMap, leftMap, rightMap] = useLoader(TextureLoader, [
     "/landing/facade.svg",
     "/landing/branch-left.svg",
@@ -27,45 +36,50 @@ function Scene({ progress }: { progress: MutableRefObject<number> }) {
   ]);
   const left = useRef<Mesh>(null);
   const right = useRef<Mesh>(null);
-  const veil = useRef<MeshBasicMaterial>(null);
+  const veil = useRef<Mesh>(null);
+  const veilMaterial = useRef<MeshBasicMaterial>(null);
   const smoothed = useRef(0);
 
-  const facadeH = Math.max(viewport.height, viewport.width / FACADE_ASPECT) * 1.08;
+  const aspect = size.width / size.height;
+  const far = visibleSize(CAM_Z, aspect);
+  const facadeH = Math.max(far.height, far.width / FACADE_ASPECT) * 1.08;
   const facadeW = facadeH * FACADE_ASPECT;
 
-  // Viewport size at the branch plane, which sits closer to the camera.
-  const k = (CAM_Z - BRANCH_Z) / CAM_Z;
-  const visibleW = viewport.width * k;
-  const branchH = viewport.height * k * 1.08;
+  // Ramas pegadas a los bordes de la pantalla: su borde exterior coincide con el margen.
+  const near = visibleSize(OVERLAY_DIST, aspect);
+  const branchH = near.height * 1.08;
   const branchW = branchH * BRANCH_ASPECT;
-  const closedX = -branchW / 2 + visibleW * 0.08;
-  const openX = -visibleW / 2 - branchW / 2 + branchW * 0.18;
+  const closedX = -near.width / 2 + branchW / 2;
+  const openX = closedX - branchW * (1 - BRANCH_REMAIN);
 
   useFrame((state, delta) => {
     smoothed.current = MathUtils.damp(smoothed.current, progress.current, 5, delta);
     const p = smoothed.current;
 
+    const dolly = smooth(0.45, 0.92, p);
+    const camX = 0;
+    const camY = MathUtils.lerp(0, -DOOR_OFFSET * facadeH, dolly);
+    const camZ = MathUtils.lerp(CAM_Z, CAM_END_Z, dolly);
+    state.camera.position.set(camX, camY, camZ);
+
     const open = smooth(0.04, 0.4, p);
     const sway = Math.sin(state.clock.elapsedTime * 0.6) * 0.008;
     const x = MathUtils.lerp(closedX, openX, open);
     if (left.current) {
-      left.current.position.x = x;
-      left.current.rotation.z = open * 0.06 + sway;
+      left.current.position.set(camX + x, camY, camZ - OVERLAY_DIST);
+      left.current.rotation.z = open * 0.04 + sway;
     }
     if (right.current) {
-      right.current.position.x = -x;
-      right.current.rotation.z = -open * 0.06 - sway;
+      right.current.position.set(camX - x, camY, camZ - OVERLAY_DIST);
+      right.current.rotation.z = -open * 0.04 - sway;
     }
-
-    // The veil hides the facade behind the branches until they part.
-    if (veil.current) veil.current.opacity = 1 - smooth(0.1, 0.38, p);
-
-    const dolly = smooth(0.45, 0.92, p);
-    state.camera.position.set(
-      0,
-      MathUtils.lerp(0, -DOOR_OFFSET * facadeH, dolly),
-      MathUtils.lerp(CAM_Z, CAM_END_Z, dolly),
-    );
+    // La cortina oculta la fachada detrás de las ramas hasta que se abren.
+    if (veil.current && veilMaterial.current) {
+      const opacity = 1 - smooth(0.1, 0.38, p);
+      veilMaterial.current.opacity = opacity;
+      veil.current.visible = opacity > 0.01;
+      veil.current.position.set(camX, camY, camZ - OVERLAY_DIST - 0.4);
+    }
   });
 
   return (
@@ -74,15 +88,15 @@ function Scene({ progress }: { progress: MutableRefObject<number> }) {
         <planeGeometry args={[facadeW, facadeH]} />
         <meshBasicMaterial map={facadeMap} toneMapped={false} />
       </mesh>
-      <mesh position={[0, 0, 0.6]}>
-        <planeGeometry args={[facadeW * 3, facadeH * 3]} />
-        <meshBasicMaterial ref={veil} color="#fde8ec" transparent toneMapped={false} />
+      <mesh ref={veil}>
+        <planeGeometry args={[near.width * 3, near.height * 3]} />
+        <meshBasicMaterial ref={veilMaterial} color="#fde8ec" transparent toneMapped={false} />
       </mesh>
-      <mesh ref={left} position={[closedX, 0, BRANCH_Z]}>
+      <mesh ref={left}>
         <planeGeometry args={[branchW, branchH]} />
         <meshBasicMaterial map={leftMap} transparent toneMapped={false} />
       </mesh>
-      <mesh ref={right} position={[-closedX, 0, BRANCH_Z]}>
+      <mesh ref={right}>
         <planeGeometry args={[branchW, branchH]} />
         <meshBasicMaterial map={rightMap} transparent toneMapped={false} />
       </mesh>
