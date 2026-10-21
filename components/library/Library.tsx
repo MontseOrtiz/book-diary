@@ -19,7 +19,7 @@ function GoalIcon() {
 function GoalBox({ year, completed, target }: { year: number; completed: number; target: number | null }) {
   const percent = target ? Math.min(100, Math.round((completed / target) * 100)) : 0;
   return (
-    <div className="mx-auto inline-flex items-center gap-4 rounded-xl border border-solid border-ink-soft/40 bg-surface px-5 py-3">
+    <div className="inline-flex w-[80vw] items-center gap-4 rounded-xl border border-solid border-ink-soft/40 bg-surface px-5 py-3">
       <GoalIcon />
       <div className="flex flex-col">
         <span className="text-sm font-medium">Meta {year}</span>
@@ -34,7 +34,7 @@ function GoalBox({ year, completed, target }: { year: number; completed: number;
           aria-valuemin={0}
           aria-valuemax={target}
           aria-valuenow={Math.min(completed, target)}
-          className="h-2.5 w-32 overflow-hidden rounded-full bg-surface-soft sm:w-48"
+          className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-full bg-surface-soft"
         >
           <div className="h-full rounded-full bg-primary" style={{ width: `${percent}%` }} />
         </div>
@@ -62,21 +62,21 @@ export function Library({
 
   return (
     <div className="flex flex-col gap-10">
-      <nav aria-label="Año" className="flex justify-center gap-2 overflow-x-auto pb-1">
-        {view.years.map((year) => (
-          <Link
-            key={year}
-            href={`/?year=${year}#biblioteca`}
-            aria-current={year === view.year ? "page" : undefined}
-            className={
-              year === view.year
-                ? "btn-primary"
-                : "btn-secondary"
-            }
-          >
-            {year}
-          </Link>
-        ))}
+      <nav aria-label="Año" className="flex max-w-full justify-center">
+        <div className="inline-flex max-w-full overflow-x-auto rounded-xl border border-primary/25 bg-surface">
+          {view.years.map((year) => (
+            <Link
+              key={year}
+              href={`/?year=${year}#biblioteca`}
+              aria-current={year === view.year ? "page" : undefined}
+              className={`px-5 py-2.5 text-center text-sm font-medium transition-colors not-first:border-l not-first:border-primary/25 ${
+                year === view.year ? "bg-primary text-surface" : "text-ink hover:bg-surface-soft"
+              }`}
+            >
+              {year}
+            </Link>
+          ))}
+        </div>
       </nav>
 
       <div className="flex justify-center">

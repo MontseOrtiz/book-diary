@@ -44,15 +44,15 @@ body {
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-surface transition-all hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex text-center items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-surface transition-all hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-primary/25 bg-surface px-5 py-2.5 text-sm font-medium text-ink transition-all hover:bg-surface-soft active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex text-center items-center justify-center gap-2 rounded-xl border border-primary/25 bg-surface px-5 py-2.5 text-sm font-medium text-ink transition-all hover:bg-surface-soft active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-ghost {
-    @apply text-sm font-medium text-ink-soft underline underline-offset-2 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-50;
+    @apply text-center text-sm font-medium text-ink-soft underline underline-offset-2 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .card-surface {

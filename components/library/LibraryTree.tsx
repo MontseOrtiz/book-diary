@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { GAP, ROW, TreeArt } from "./treeArt";
 import type { LibraryEntry } from "@/lib/library";
@@ -14,6 +15,15 @@ function hash(text: string) {
   for (const char of text) h = (h * 31 + char.charCodeAt(0)) >>> 0;
   return h;
 }
+
+const DECOR_ICONS = [
+  "/landing/Bunny-Icon.png",
+  "/landing/Watercolor-Globe-Icon.png",
+  "/landing/ceramic-bouquete-icon.png",
+  "/landing/portrait-icon.png",
+];
+// Con más libros que esto la repisa ya está llena y el adorno estorba.
+const DECOR_MAX_BOOKS = 3;
 
 interface Selection {
   entry: LibraryEntry;
@@ -104,10 +114,17 @@ function Shelf({
             />
           ))
         ) : (
-          <p className="self-center pl-2 text-sm text-ink-soft">
-            <span aria-hidden="true">✿ </span>
-            {empty ?? "Sin lecturas este mes."}
-          </p>
+          <p className="self-center pl-2 text-sm text-ink-soft">{empty ?? "Sin lecturas este mes."}</p>
+        )}
+        {side && entries.length <= DECOR_MAX_BOOKS && (
+          <Image
+            src={DECOR_ICONS[hash(id) % DECOR_ICONS.length]}
+            alt=""
+            aria-hidden="true"
+            width={96}
+            height={96}
+            className="mx-2 h-20 w-20 shrink-0 self-end object-contain"
+          />
         )}
       </div>
     </section>
@@ -233,7 +250,6 @@ export function LibraryTree({
   }, [selection]);
 
   const selectedId = selection?.entry.reading.id ?? null;
-  const treeRef = useRef<HTMLDivElement>(null);
   const monthShelf = (index: number, side: "left" | "right") => (
     <Shelf
       key={MONTH_NAMES[index]}
@@ -248,8 +264,8 @@ export function LibraryTree({
 
   return (
     <div className="flex flex-col gap-10">
-      <div ref={treeRef} className="relative">
-        <TreeArt wrapperRef={treeRef} />
+      <div className="relative">
+        <TreeArt />
         <div className="relative z-10 flex flex-col gap-10">
           <Shelf
             id="leyendo"

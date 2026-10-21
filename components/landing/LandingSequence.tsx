@@ -44,14 +44,11 @@ function StaticLanding() {
   return (
     <section
       aria-label="Introducción"
-      className="relative flex h-screen flex-col items-center justify-end bg-[url(/landing/book-store-hero.png)] bg-cover bg-center px-4 py-10 text-center"
+      className="relative h-screen bg-[url(/landing/book-store-hero.png)] bg-cover bg-center px-4 py-10 text-center"
     >
       <div aria-hidden="true" className="absolute inset-0 bg-[url(/landing/branch-left.png)] bg-cover bg-left-top" />
       <div aria-hidden="true" className="absolute inset-0 bg-[url(/landing/branch-right.png)] bg-cover bg-right-top" />
       <h1 className="sr-only">Book Diary</h1>
-      <a href="#biblioteca" className="btn-primary absolute bottom-8 left-1/2 -translate-x-1/2">
-        Entrar a la biblioteca
-      </a>
     </section>
   );
 }

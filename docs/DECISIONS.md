@@ -383,6 +383,17 @@ La propietaria declara que los registros de v1 en Supabase **eran solo pruebas, 
 
 **Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
 
+### DEC-053 — Árbol ilustrado, adornos por repisa, selector de años y hero sin botón (ajusta DEC-050 y DEC-052)
+**Estado:** APROBADA · **Fecha de aprobación:** 21/10/2026
+
+1. **Árbol:** `public/landing/tree_base.png` sustituye al árbol dibujado en SVG; se estira al alto de la biblioteca (solo escritorio). Las ramas de la imagen no se alinean exactamente con cada repisa.
+2. **Adornos:** cuatro ilustraciones (conejo, globo, ramo, retrato) aparecen, elegidas de forma estable por mes, solo en repisas con 3 libros o menos.
+3. **Años:** grupo de botones unidos; el año seleccionado queda activo y por defecto es el año en curso.
+4. **Meta:** la caja ocupa al menos el 80 % del ancho de la pantalla.
+5. **Hero:** se quita el botón «Entrar a la biblioteca». Los textos de los botones se centran.
+
+**Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
+
 ## 6. Decisiones todavía pendientes (no aprobadas)
 
 Estado vigente al **19/10/2026**: ninguna OPEN/TECH se cierra por completo. DEC-033–DEC-041 resuelven subreglas concretas; las partes restantes siguen pendientes y bloquean solo las tareas que dependen de ellas:
