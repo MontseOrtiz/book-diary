@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireOwner } from "@/lib/auth/owner";
+import { searchCatalogs, type BookSearchResult } from "@/lib/book-search";
 import { createClient } from "@/lib/supabase/server";
 import {
   endsBeforeStart,
@@ -53,6 +54,15 @@ function dateColumns(prefix: "started" | "finished", d: PartialDate | null) {
   };
 }
 
+export type SearchState = { results: BookSearchResult[]; failed: boolean };
+
+export async function searchBooks(query: string): Promise<SearchState> {
+  await requireOwner();
+  const trimmed = query.trim();
+  if (trimmed.length < 2) return { results: [], failed: false };
+  return searchCatalogs(trimmed);
+}
+
 export async function createReading(_prev: FormState, formData: FormData): Promise<FormState> {
   await requireOwner();
   const supabase = await createClient();
@@ -76,13 +86,30 @@ export async function createReading(_prev: FormState, formData: FormData): Promi
     if (!title) return { error: "Escribe el título o elige un libro existente." };
 
     const matchKey = normalizeKey(title, author);
-    const { data: existing } = await supabase.from("books").select("id").eq("match_key", matchKey).limit(1);
+    const openLibraryId = text(formData, "open_library_id");
+    const googleBooksId = text(formData, "google_books_id");
+    const ids = [
+      `match_key.eq.${matchKey.replace(/[,()]/g, " ")}`,
+      ...(openLibraryId ? [`open_library_id.eq.${openLibraryId}`] : []),
+      ...(googleBooksId ? [`google_books_id.eq.${googleBooksId}`] : []),
+    ];
+    const { data: existing } = await supabase.from("books").select("id").or(ids.join(",")).limit(1);
     if (existing?.length) {
       return { error: "Ese libro ya existe. Elígelo en la lista para crear una relectura." };
     }
+    const genres = text(formData, "genres");
     const { data: book, error } = await supabase
       .from("books")
-      .insert({ title, author: author || null, cover_url: text(formData, "cover_url"), match_key: matchKey })
+      .insert({
+        title,
+        author: author || null,
+        cover_url: text(formData, "cover_url"),
+        synopsis: text(formData, "synopsis"),
+        genres: genres ? genres.split("|") : null,
+        open_library_id: openLibraryId,
+        google_books_id: googleBooksId,
+        match_key: matchKey,
+      })
       .select("id")
       .single();
     if (error) return { error: "No se pudo guardar el libro." };

@@ -340,6 +340,16 @@ La propietaria declara que los registros de v1 en Supabase **eran solo pruebas, 
 
 **Motivo:** la propietaria prefiere un acceso simple con las credenciales ya creadas. **Documentos afectados:** `docs/DECISIONS.md` (§6). Esta decisión no cambia RLS ni el esquema.
 
+### DEC-049 — Búsqueda dual de catálogos y retiro de foto/IA del alcance actual (cierre parcial de OPEN-02)
+**Estado:** APROBADA · **Fecha de aprobación:** 20/10/2026
+
+1. **Búsqueda:** el formulario «Agregar libro» busca por título o autor en **Open Library y Google Books** a la vez, desde el servidor y solo para la propietaria autenticada. Los resultados se mezclan y se **deduplican** por título+autor normalizados, conservando ambos identificadores del catálogo y completando campos faltantes (portada, sinopsis, géneros) con el otro proveedor. Elegir un resultado rellena un formulario **editable**; la propietaria confirma antes de guardar (DEC-010/011).
+2. **Fallos y límites:** cada proveedor tiene un tiempo de espera corto; si uno falla se muestran los resultados del otro, y si fallan ambos se indica y queda disponible el **alta manual** (DEC-012). Sin claves ni cuotas propias: solo búsquedas públicas.
+3. **Foto con IA fuera del alcance actual:** se retira la ruta `parse-book-photo` y la dependencia `@google/genai`; no se consume ninguna API de IA. Puede retomarse como corte aparte si se decide (la propietaria señaló que los planes gratuitos suelen tardar o quedar en cola).
+4. **Duplicados (DEC-044):** al guardar, se sugiere/rechaza un libro cuyo ID de catálogo o título+autor normalizados ya existan, remitiendo a «nueva lectura» desde la lista de libros existentes.
+
+**Motivo:** cubrir la captura asistida con el menor costo y complejidad. **Documentos afectados:** `docs/DECISIONS.md` (§6). **Siguen pendientes (OPEN-02):** prioridad fina de campos entre proveedores y cualquier uso de IA/foto.
+
 ## 6. Decisiones todavía pendientes (no aprobadas)
 
 Estado vigente al **19/10/2026**: ninguna OPEN/TECH se cierra por completo. DEC-033–DEC-041 resuelven subreglas concretas; las partes restantes siguen pendientes y bloquean solo las tareas que dependen de ellas:
