@@ -23,7 +23,7 @@ export default async function Home({
         Saltar a la biblioteca
       </a>
       <LandingSequence />
-      <main id="biblioteca" tabIndex={-1} className="mx-auto w-full max-w-5xl px-4 py-24">
+      <main id="biblioteca" tabIndex={-1} className="mx-auto w-full max-w-6xl px-4 py-24">
         <h2 className="mb-8 font-serif text-4xl">Biblioteca</h2>
         <Library
           owner={owner}

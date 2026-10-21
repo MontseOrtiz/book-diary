@@ -2,14 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { GAP, ROW, TreeArt } from "./treeArt";
 import type { LibraryEntry } from "@/lib/library";
 import { formatPartialDate } from "@/lib/format";
 import { FORMAT_LABELS, MONTH_NAMES } from "@/types/library";
 
 const SPINE_COLORS = ["#7c4a57", "#4f6f56", "#8a5a44", "#4d647a", "#6b4f7a", "#9a4f55", "#6e6a4a"];
-const ROW = 150;
-const GAP = 14;
-const PLANK = "#8a6a55";
 
 function hash(text: string) {
   let h = 0;
@@ -62,11 +60,18 @@ function Spine({
   );
 }
 
+const SIDE_PADDING = {
+  left: "md:pl-[84px] md:pr-5",
+  right: "md:pl-5 md:pr-[84px]",
+  top: "md:px-[84px]",
+} as const;
+
 function Shelf({
   id,
   title,
   entries,
   empty,
+  side,
   selectedId,
   onSelect,
 }: {
@@ -74,22 +79,20 @@ function Shelf({
   title: string;
   entries: LibraryEntry[];
   empty?: string;
+  side?: "left" | "right" | "top";
   selectedId: string | null;
   onSelect: (entry: LibraryEntry, trigger: HTMLElement) => void;
 }) {
   return (
-    <section aria-labelledby={id} className="min-w-0">
+    <section aria-labelledby={id} className="min-w-0" data-shelf={side ? id : undefined} data-side={side}>
       <h3 id={id} className="mb-2 font-serif text-xl">
         {title}
       </h3>
       <div
-        className="flex flex-nowrap items-end gap-x-1 overflow-x-auto md:flex-wrap md:overflow-visible"
-        style={{
-          rowGap: GAP,
-          paddingBottom: GAP,
-          minHeight: ROW + GAP,
-          backgroundImage: `repeating-linear-gradient(to bottom, transparent 0 ${ROW}px, ${PLANK} ${ROW}px ${ROW + GAP}px)`,
-        }}
+        data-books
+        data-art={side ? "" : undefined}
+        className={`shelf-planks flex flex-nowrap items-end gap-x-1 overflow-x-auto md:flex-wrap md:overflow-visible ${side ? SIDE_PADDING[side] : ""}`}
+        style={{ rowGap: GAP, paddingBottom: GAP, minHeight: ROW + GAP }}
       >
         {entries.length ? (
           entries.map((entry) => (
@@ -230,12 +233,14 @@ export function LibraryTree({
   }, [selection]);
 
   const selectedId = selection?.entry.reading.id ?? null;
-  const monthShelf = (index: number) => (
+  const treeRef = useRef<HTMLDivElement>(null);
+  const monthShelf = (index: number, side: "left" | "right") => (
     <Shelf
       key={MONTH_NAMES[index]}
       id={`mes-${index}`}
       title={MONTH_NAMES[index]}
       entries={months[index]}
+      side={side}
       selectedId={selectedId}
       onSelect={select}
     />
@@ -243,23 +248,26 @@ export function LibraryTree({
 
   return (
     <div className="flex flex-col gap-10">
-      <Shelf
-        id="leyendo"
-        title="Actualmente leyendo"
-        entries={reading}
-        empty="Sin lecturas en curso."
-        selectedId={selectedId}
-        onSelect={select}
-      />
+      <div ref={treeRef} className="relative">
+        <TreeArt wrapperRef={treeRef} />
+        <div className="relative z-10 flex flex-col gap-10">
+          <Shelf
+            id="leyendo"
+            title="Actualmente leyendo"
+            entries={reading}
+            empty="Sin lecturas en curso."
+            side="top"
+            selectedId={selectedId}
+            onSelect={select}
+          />
 
-      <div className="grid gap-8 md:grid-cols-[1fr_28px_1fr]">
-        <div className="flex flex-col gap-8">{[0, 1, 2, 3, 4, 5].map(monthShelf)}</div>
-        <div
-          aria-hidden="true"
-          className="hidden rounded-full md:block"
-          style={{ background: "linear-gradient(90deg, #4a332d, #5b4038 50%, #4a332d)" }}
-        />
-        <div className="flex flex-col gap-8">{[6, 7, 8, 9, 10, 11].map(monthShelf)}</div>
+          <div data-grid className="grid gap-8 md:grid-cols-[1fr_96px_1fr]">
+            <div className="flex flex-col gap-8">{[0, 1, 2, 3, 4, 5].map((i) => monthShelf(i, "left"))}</div>
+            <div aria-hidden="true" className="hidden md:block" />
+            <div className="flex flex-col gap-8">{[6, 7, 8, 9, 10, 11].map((i) => monthShelf(i, "right"))}</div>
+          </div>
+        </div>
+        <div aria-hidden="true" className="hidden h-52 md:block" />
       </div>
 
       {noMonth.length > 0 && (

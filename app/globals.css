@@ -107,3 +107,13 @@ body {
     animation: cover-in 0.5s ease-out;
   }
 }
+
+/* Tabla de cada fila de la repisa. En escritorio la dibujan las ramas del árbol. */
+.shelf-planks {
+  background-image: repeating-linear-gradient(to bottom, transparent 0 150px, #8a6a55 150px 164px);
+}
+@media (min-width: 768px) {
+  .shelf-planks[data-art] {
+    background-image: none !important;
+  }
+}
