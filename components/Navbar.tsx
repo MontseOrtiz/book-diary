@@ -4,7 +4,7 @@ import Link from "next/link";
 // y de ahí de vuelta al formulario.
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-40 h-16 bg-background/10 backdrop-blur-sm">
+    <header className="site-nav sticky top-0 z-40 h-16 bg-background/10 backdrop-blur-sm transition-opacity duration-500">
       <div className="mx-auto flex h-full w-full max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex flex-col leading-none">
           <span className="font-display text-4xl">Book Diary</span>

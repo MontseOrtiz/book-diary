@@ -16,12 +16,6 @@ export default async function Home({
 
   return (
     <>
-      <a
-        href="#biblioteca"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-surface focus:px-3 focus:py-2"
-      >
-        Saltar a la biblioteca
-      </a>
       <div className="-mt-16">
         <LandingSequence />
       </div>

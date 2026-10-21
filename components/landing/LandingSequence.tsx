@@ -34,6 +34,17 @@ function hasWebGL() {
   return webglSupport;
 }
 
+function SkipLink({ className }: { className: string }) {
+  return (
+    <a
+      href="#biblioteca"
+      className={`sr-only focus:not-sr-only focus:rounded focus:bg-surface focus:px-3 focus:py-2 focus:text-sm ${className}`}
+    >
+      Saltar a la biblioteca
+    </a>
+  );
+}
+
 function smooth(from: number, to: number, value: number) {
   const t = Math.min(1, Math.max(0, (value - from) / (to - from)));
   return t * t * (3 - 2 * t);
@@ -49,6 +60,7 @@ function StaticLanding() {
       <div aria-hidden="true" className="absolute inset-0 bg-[url(/landing/branch-left.png)] bg-cover bg-left-top" />
       <div aria-hidden="true" className="absolute inset-0 bg-[url(/landing/branch-right.png)] bg-cover bg-right-top" />
       <h1 className="sr-only">Book Diary</h1>
+      <SkipLink className="focus:absolute focus:left-1/2 focus:top-24 focus:-translate-x-1/2" />
     </section>
   );
 }
@@ -88,7 +100,7 @@ function AnimatedLanding({ onDone }: { onDone: () => void }) {
   }, [onDone]);
 
   return (
-    <section ref={sectionRef} aria-label="Introducción" className="relative h-[500vh]">
+    <section ref={sectionRef} data-intro-playing aria-label="Introducción" className="relative h-[500vh]">
       <div className="sticky top-0 h-screen overflow-hidden">
         <div aria-hidden="true" className="absolute inset-0">
           <LandingCanvas progress={progress} />
@@ -103,6 +115,7 @@ function AnimatedLanding({ onDone }: { onDone: () => void }) {
           <p className="text-ink-soft [text-shadow:0_1px_12px_var(--background)]">
             Un diario personal de lecturas
           </p>
+          <SkipLink className="pointer-events-auto" />
         </div>
         <div
           ref={hintRef}

@@ -42,6 +42,12 @@ body {
   color: var(--text-primary);
 }
 
+/* El navbar espera a que termine la animación de entrada. */
+body:has([data-intro-playing]) .site-nav {
+  opacity: 0;
+  visibility: hidden;
+}
+
 @layer components {
   .btn-primary {
     @apply inline-flex text-center items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-surface transition-all hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
