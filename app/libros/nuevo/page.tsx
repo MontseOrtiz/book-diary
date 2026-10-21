@@ -5,7 +5,7 @@ import { isOwner } from "@/lib/auth/owner";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function NewReadingPage() {
-  if (!(await isOwner())) redirect("/login");
+  if (!(await isOwner())) redirect("/login?next=/libros/nuevo");
 
   const supabase = await createClient();
   const { data: books } = await supabase.from("books").select("id, title, author").order("title");
@@ -15,7 +15,7 @@ export default async function NewReadingPage() {
       <Link href="/#biblioteca" className="btn-ghost self-start">
         ← Volver
       </Link>
-      <h1 className="font-serif text-3xl">Agregar libro</h1>
+      <h1 className="font-display text-5xl">Agregar libro</h1>
       <NewReadingForm books={books ?? []} />
     </main>
   );

@@ -32,8 +32,9 @@
   --color-error: var(--error);
   --color-info: var(--info);
 
-  --font-serif: var(--font-newsreader);
-  --font-sans: var(--font-work-sans);
+  --font-display: var(--font-sacramento);
+  --font-serif: var(--font-gayathri);
+  --font-sans: var(--font-gayathri);
 }
 
 body {

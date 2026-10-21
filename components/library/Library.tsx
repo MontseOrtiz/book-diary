@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { LibraryResult } from "@/lib/library";
 import { selectYear } from "@/lib/library";
-import { saveGoal } from "@/app/actions";
 import { signOut } from "@/app/login/actions";
+import { GoalEditor } from "./GoalEditor";
 import { LibraryTree } from "./LibraryTree";
 
 function GoalIcon() {
@@ -82,25 +82,10 @@ export function Library({
       <div className="flex justify-center">
         <GoalBox year={view.year} completed={view.completed} target={view.goal?.target_count ?? null} />
       </div>
-      {owner && (
-        <form action={saveGoal} className="flex items-end justify-center gap-2">
-          <input type="hidden" name="year" value={view.year} />
-          <label className="flex flex-col gap-1 text-sm">
-            Meta {view.year}
-            <input name="target_count" type="number" min={1} defaultValue={view.goal?.target_count ?? ""}
-              className="field w-28" />
-          </label>
-          <button type="submit" className="btn-secondary">
-            Guardar meta
-          </button>
-        </form>
-      )}
+      {owner && <GoalEditor year={view.year} current={view.goal?.target_count ?? null} />}
 
       {owner && (
         <div className="flex items-center justify-center gap-4">
-          <Link href="/libros/nuevo" className="btn-primary">
-            Agregar libro
-          </Link>
           <form action={signOut}>
             <button type="submit" className="btn-ghost">
               Salir

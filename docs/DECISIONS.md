@@ -373,6 +373,16 @@ La propietaria declara que los registros de v1 en Supabase **eran solo pruebas, 
 
 **Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
 
+### DEC-052 — Navbar, tipografías, meta plegable y ramas en el hero estático (ajusta DEC-047 y DEC-051)
+**Estado:** APROBADA · **Fecha de aprobación:** 21/10/2026
+
+1. **Ramas:** al terminar el scroll, el hero estático conserva las ramas de cerezo en sus esquinas (corrige DEC-051 punto 1).
+2. **Tipografías:** Sacramento para títulos grandes y Gayathri para el cuerpo; sustituyen a Newsreader y Work Sans.
+3. **Meta:** el formulario de meta está oculto y se abre con «Cambiar meta» (o «Establecer meta» si no existe); solo lo ve la propietaria.
+4. **Navbar:** fija, con el color de fondo al 10 % de opacidad (90 % transparente) y desenfoque. Izquierda: «Book Diary / by Montse»; derecha: botón «Agregar libro» visible para todos. Sin sesión lleva a `/login` y, tras entrar, al formulario (`?next=` solo admite rutas internas). Esto sustituye la regla de que «Agregar libro» solo se muestra a la propietaria; la autorización real sigue en servidor y RLS.
+
+**Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
+
 ## 6. Decisiones todavía pendientes (no aprobadas)
 
 Estado vigente al **19/10/2026**: ninguna OPEN/TECH se cierra por completo. DEC-033–DEC-041 resuelven subreglas concretas; las partes restantes siguen pendientes y bloquean solo las tareas que dependen de ellas:

@@ -22,7 +22,7 @@ export default async function EditReadingPage({ params }: { params: Promise<{ id
       <Link href="/#biblioteca" className="btn-ghost self-start">
         ← Volver
       </Link>
-      <h1 className="font-serif text-3xl">Editar lectura</h1>
+      <h1 className="font-display text-5xl">Editar lectura</h1>
       <EditReadingForm data={data} />
 
       {reading.status === "reading" && (

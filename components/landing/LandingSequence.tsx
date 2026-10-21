@@ -44,10 +44,12 @@ function StaticLanding() {
   return (
     <section
       aria-label="Introducción"
-      className="relative flex h-screen flex-col items-center justify-start bg-[url(/landing/book-store-hero.png)] bg-cover bg-center px-4 py-10 text-center"
+      className="relative flex h-screen flex-col items-center justify-end bg-[url(/landing/book-store-hero.png)] bg-cover bg-center px-4 py-10 text-center"
     >
+      <div aria-hidden="true" className="absolute inset-0 bg-[url(/landing/branch-left.png)] bg-cover bg-left-top" />
+      <div aria-hidden="true" className="absolute inset-0 bg-[url(/landing/branch-right.png)] bg-cover bg-right-top" />
       <h1 className="sr-only">Book Diary</h1>
-      <a href="#biblioteca" className="btn-primary">
+      <a href="#biblioteca" className="btn-primary absolute bottom-8 left-1/2 -translate-x-1/2">
         Entrar a la biblioteca
       </a>
     </section>
@@ -98,7 +100,7 @@ function AnimatedLanding({ onDone }: { onDone: () => void }) {
           ref={titleRef}
           className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center"
         >
-          <h1 className="font-serif text-6xl text-ink [text-shadow:0_2px_24px_var(--background)] sm:text-8xl">
+          <h1 className="font-display text-8xl text-ink [text-shadow:0_2px_24px_var(--background)] sm:text-9xl">
             Book Diary
           </h1>
           <p className="text-ink-soft [text-shadow:0_1px_12px_var(--background)]">

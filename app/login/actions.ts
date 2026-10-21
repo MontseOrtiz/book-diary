@@ -14,7 +14,9 @@ export async function signIn(_prev: LoginState, formData: FormData): Promise<Log
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: "Correo o contraseña incorrectos." };
 
-  redirect("/");
+  // Solo rutas internas: evita redirecciones abiertas.
+  const next = String(formData.get("next") ?? "");
+  redirect(next.startsWith("/") && !next.startsWith("//") ? next : "/");
 }
 
 export async function signOut() {
