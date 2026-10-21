@@ -350,6 +350,19 @@ La propietaria declara que los registros de v1 en Supabase **eran solo pruebas, 
 
 **Motivo:** cubrir la captura asistida con el menor costo y complejidad. **Documentos afectados:** `docs/DECISIONS.md` (§6). **Siguen pendientes (OPEN-02):** prioridad fina de campos entre proveedores y cualquier uso de IA/foto.
 
+### DEC-050 — Árbol-librero: propuesta de algoritmo, accesibilidad y panel (OPEN-06) — PROPUESTA, pendiente de aprobación
+**Estado:** PROPUESTA implementada por solicitud de la propietaria de continuar; **no aprobada** hasta que la revise · **Fecha:** 20/10/2026
+
+1. **Distribución:** rama superior «Actualmente leyendo» a todo lo ancho; debajo, un tronco central con **enero–junio a la izquierda y julio–diciembre a la derecha**, de arriba abajo. «Sin mes registrado» y «Abandonados» van como repisas bajo el árbol.
+2. **Dinámico (DEC-006):** cada repisa tiene ancho fijo y los libros se **acomodan en filas**; al llenarse una fila se añade otra con su propia tabla, así que la repisa crece en altura con la cantidad de libros y nunca se solapan ni se ocultan. Los meses vacíos conservan repisa, etiqueta y una florecita (DEC-031).
+3. **Lomos:** ancho, alto y color derivados del identificador de la lectura (estable entre visitas), con el título en vertical; no se afirma que exista imagen real del lomo.
+4. **Selección y panel (DEC-020):** cada lomo es un botón; al activarlo el libro sube, se abre un **panel lateral** con la portada (con giro de entrada), datos, sinopsis y «Editar» solo para la propietaria. Se cierra con el botón o **Esc** y el foco vuelve al lomo.
+5. **Móvil (DEC-021):** las repisas son filas con desplazamiento horizontal y el panel es una **hoja inferior** (*bottom sheet*).
+6. **Movimiento reducido (DEC-029):** sin transiciones ni giro; el contenido y el panel funcionan igual.
+7. **Límites:** sin virtualización (adecuado para cientos de libros por año); rendimiento no medido.
+
+**Pendiente de aprobar:** esta distribución, la mecánica del panel y los límites. Si no te convence, se ajusta sin tocar datos ni esquema.
+
 ## 6. Decisiones todavía pendientes (no aprobadas)
 
 Estado vigente al **19/10/2026**: ninguna OPEN/TECH se cierra por completo. DEC-033–DEC-041 resuelven subreglas concretas; las partes restantes siguen pendientes y bloquean solo las tareas que dependen de ellas:
