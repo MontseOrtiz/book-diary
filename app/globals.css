@@ -129,7 +129,7 @@ body:has([data-intro-playing]) .site-nav {
 .shelf-art::before {
   content: "";
   position: absolute;
-  z-index: -2; /* debajo del tronco (z -1), que va debajo de los libros */
+  z-index: 1; /* encima de libros y adornos, debajo del tronco (z 2) */
   left: 0;
   right: 0;
   top: 111px;

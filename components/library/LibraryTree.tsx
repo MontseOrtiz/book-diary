@@ -16,12 +16,18 @@ function hash(text: string) {
   return h;
 }
 
+// `drop` = margen transparente inferior de cada imagen (fracción de su alto), para que el
+// objeto pise la repisa en vez de flotar sobre ella.
 const DECOR_ICONS = [
-  "/landing/Bunny-Icon.png",
-  "/landing/Watercolor-Globe-Icon.png",
-  "/landing/ceramic-bouquete-icon.png",
-  "/landing/portrait-icon.png",
+  { src: "/landing/Bunny-Icon.png", drop: 0.117 },
+  { src: "/landing/Watercolor-Globe-Icon.png", drop: 0.069 },
+  { src: "/landing/ceramic-bouquete-icon.png", drop: 0.074 },
+  { src: "/landing/portrait-icon.png", drop: 0.206 },
 ];
+const DECOR_SIZE = 96;
+// Los libros y adornos se hunden un poco tras la cara de la rama, que va por delante.
+const SINK = 6;
+
 // Adornos por repisa: más cuando hay pocos libros, ninguno cuando ya está llena.
 function decorCount(books: number) {
   if (books <= 2) return 2;
@@ -29,7 +35,7 @@ function decorCount(books: number) {
   return 0;
 }
 
-type Item = { kind: "book"; entry: LibraryEntry } | { kind: "decor"; src: string; key: string };
+type Item = { kind: "book"; entry: LibraryEntry } | { kind: "decor"; icon: (typeof DECOR_ICONS)[number]; key: string };
 
 /** Mezcla adornos entre los libros (al inicio, en medio o al final), estable por repisa. */
 function withDecor(id: string, entries: LibraryEntry[], enabled: boolean): Item[] {
@@ -42,9 +48,9 @@ function withDecor(id: string, entries: LibraryEntry[], enabled: boolean): Item[
   };
   const icons = [...DECOR_ICONS];
   for (let i = 0; i < decorCount(entries.length) && icons.length; i++) {
-    const src = icons.splice(Math.floor(next() * icons.length), 1)[0];
+    const icon = icons.splice(Math.floor(next() * icons.length), 1)[0];
     const slot = Math.floor(next() * (items.length + 1));
-    items.splice(slot, 0, { kind: "decor", src, key: `decor-${i}` });
+    items.splice(slot, 0, { kind: "decor", icon, key: `decor-${i}` });
   }
   return items;
 }
@@ -70,7 +76,7 @@ function Spine({
   const label = entry.book.author ? `${entry.book.title}, ${entry.book.author}` : entry.book.title;
 
   return (
-    <div className="flex shrink-0 items-end" style={{ height: ROW }}>
+    <div className="flex shrink-0 items-end" style={{ height: ROW, transform: `translateY(${SINK}px)` }}>
       <button
         type="button"
         aria-pressed={selected}
@@ -147,12 +153,13 @@ function Shelf({
           ) : (
             <Image
               key={item.key}
-              src={item.src}
+              src={item.icon.src}
               alt=""
               aria-hidden="true"
-              width={96}
-              height={96}
-              className="mx-1 h-20 w-20 shrink-0 self-end object-contain"
+              width={DECOR_SIZE}
+              height={DECOR_SIZE}
+              className="mx-1 shrink-0 self-end object-contain"
+              style={{ width: DECOR_SIZE, height: DECOR_SIZE, transform: `translateY(${Math.round(item.icon.drop * DECOR_SIZE) + SINK}px)` }}
             />
           ),
         )}
@@ -313,7 +320,7 @@ export function LibraryTree({
             <div className="flex flex-col gap-8">{[6, 7, 8, 9, 10, 11].map((i) => monthShelf(i, "right"))}</div>
           </div>
         </div>
-        <div aria-hidden="true" className="hidden h-6 md:block" />
+        <div aria-hidden="true" className="hidden h-16 md:block" />
       </div>
 
       {noMonth.length > 0 && (
