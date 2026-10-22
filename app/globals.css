@@ -125,12 +125,11 @@ body:has([data-intro-playing]) .site-nav {
    top = alto del título (36px) + 75px (la cara superior de la rama queda a 75px del borde de la imagen). */
 .shelf-art {
   position: relative;
-  isolation: isolate;
 }
 .shelf-art::before {
   content: "";
   position: absolute;
-  z-index: -1;
+  z-index: -2; /* debajo del tronco (z -1), que va debajo de los libros */
   left: 0;
   right: 0;
   top: 111px;
@@ -140,13 +139,48 @@ body:has([data-intro-playing]) .site-nav {
   pointer-events: none;
 }
 .shelf-art[data-plank="l"]::before {
+  right: -24px; /* el tocón entra bajo el tronco */
   background-image: url(/tree/plank-l.webp);
 }
 .shelf-art[data-plank="r"]::before {
+  left: -24px;
   background-image: url(/tree/plank-r.webp);
 }
 .shelf-art[data-plank="t"]::before {
   background-image: url(/tree/plank-l.webp), url(/tree/plank-r.webp);
   background-size: 50% 164px, 50% 164px;
   background-position: 0 0, 100% 0;
+}
+
+/* Letrero de mes colgado de la pared: dos clavos, dos cuerdas y una tabla de madera.
+   Mide 28px de alto para no mover el resto de la repisa. */
+.month-sign {
+  position: relative;
+  display: inline-block;
+  padding: 0 1rem;
+  font-family: var(--font-sacramento), cursive;
+  font-size: 1.9rem;
+  line-height: 26px;
+  color: var(--text-primary);
+  background: linear-gradient(to bottom, #f3e0c1, #e6c9a0);
+  border: 1px solid #b58a5c;
+  border-radius: 6px;
+  box-shadow: 0 2px 3px rgb(90 60 40 / 0.25);
+}
+.month-sign::before,
+.month-sign::after {
+  content: "";
+  position: absolute;
+  top: -15px;
+  width: 5px;
+  height: 15px;
+  background:
+    radial-gradient(circle at 50% 2.5px, #5b4038 2.5px, transparent 3px),
+    linear-gradient(to right, transparent 2px, #8a6a55 2px 3px, transparent 3px);
+}
+.month-sign::before {
+  left: 18%;
+}
+.month-sign::after {
+  right: 18%;
 }

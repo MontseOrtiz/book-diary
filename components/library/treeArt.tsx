@@ -7,7 +7,7 @@ export function TreeArt() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 bottom-0 top-[176px] z-0 hidden justify-center md:flex"
+      className="pointer-events-none absolute inset-x-0 bottom-0 top-[176px] -z-[1] hidden justify-center md:flex"
     >
       <div className="flex h-full w-[640px] max-w-none shrink-0 flex-col">
         {/* eslint-disable-next-line @next/next/no-img-element */}

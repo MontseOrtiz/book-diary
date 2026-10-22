@@ -22,8 +22,32 @@ const DECOR_ICONS = [
   "/landing/ceramic-bouquete-icon.png",
   "/landing/portrait-icon.png",
 ];
-// Con más libros que esto la repisa ya está llena y el adorno estorba.
-const DECOR_MAX_BOOKS = 3;
+// Adornos por repisa: más cuando hay pocos libros, ninguno cuando ya está llena.
+function decorCount(books: number) {
+  if (books <= 2) return 2;
+  if (books <= 5) return 1;
+  return 0;
+}
+
+type Item = { kind: "book"; entry: LibraryEntry } | { kind: "decor"; src: string; key: string };
+
+/** Mezcla adornos entre los libros (al inicio, en medio o al final), estable por repisa. */
+function withDecor(id: string, entries: LibraryEntry[], enabled: boolean): Item[] {
+  const items: Item[] = entries.map((entry) => ({ kind: "book", entry }));
+  if (!enabled) return items;
+  let seed = hash(id);
+  const next = () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const icons = [...DECOR_ICONS];
+  for (let i = 0; i < decorCount(entries.length) && icons.length; i++) {
+    const src = icons.splice(Math.floor(next() * icons.length), 1)[0];
+    const slot = Math.floor(next() * (items.length + 1));
+    items.splice(slot, 0, { kind: "decor", src, key: `decor-${i}` });
+  }
+  return items;
+}
 
 interface Selection {
   entry: LibraryEntry;
@@ -101,35 +125,36 @@ function Shelf({
       data-side={side}
       data-plank={side ? { left: "l", right: "r", top: "t" }[side] : undefined}
     >
-      <h3 id={id} className="mb-2 font-serif text-xl">
-        {title}
+      <h3 id={id} className="mb-2 h-7">
+        <span className="month-sign">{title}</span>
       </h3>
       <div
         data-books
         className={`${side ? "" : "shelf-planks"} flex flex-nowrap items-end gap-x-1 overflow-x-auto md:flex-wrap md:overflow-visible ${side ? SIDE_PADDING[side] : ""}`}
         style={{ rowGap: GAP, paddingBottom: side ? 56 : GAP, minHeight: ROW + GAP + (side ? 30 : 0) }}
       >
-        {entries.length ? (
-          entries.map((entry) => (
-            <Spine
-              key={entry.reading.id}
-              entry={entry}
-              selected={entry.reading.id === selectedId}
-              onSelect={onSelect}
-            />
-          ))
-        ) : (
+        {!entries.length && (
           <p className="self-center pl-2 text-sm text-ink-soft">{empty ?? "Sin lecturas este mes."}</p>
         )}
-        {side && entries.length <= DECOR_MAX_BOOKS && (
-          <Image
-            src={DECOR_ICONS[hash(id) % DECOR_ICONS.length]}
-            alt=""
-            aria-hidden="true"
-            width={96}
-            height={96}
-            className="mx-2 h-20 w-20 shrink-0 self-end object-contain"
-          />
+        {withDecor(id, entries, Boolean(side)).map((item) =>
+          item.kind === "book" ? (
+            <Spine
+              key={item.entry.reading.id}
+              entry={item.entry}
+              selected={item.entry.reading.id === selectedId}
+              onSelect={onSelect}
+            />
+          ) : (
+            <Image
+              key={item.key}
+              src={item.src}
+              alt=""
+              aria-hidden="true"
+              width={96}
+              height={96}
+              className="mx-1 h-20 w-20 shrink-0 self-end object-contain"
+            />
+          ),
         )}
       </div>
     </section>
@@ -269,9 +294,9 @@ export function LibraryTree({
 
   return (
     <div className="flex flex-col gap-10">
-      <div className="relative">
+      <div className="relative isolate">
         <TreeArt />
-        <div className="relative z-10 flex flex-col gap-10">
+        <div className="flex flex-col gap-10">
           <Shelf
             id="leyendo"
             title="Actualmente leyendo"
@@ -282,7 +307,7 @@ export function LibraryTree({
             onSelect={select}
           />
 
-          <div data-grid className="grid gap-8 md:grid-cols-[1fr_64px_1fr]">
+          <div data-grid className="grid gap-8 md:grid-cols-[1fr_24px_1fr]">
             <div className="flex flex-col gap-8">{[0, 1, 2, 3, 4, 5].map((i) => monthShelf(i, "left"))}</div>
             <div aria-hidden="true" className="hidden md:block" />
             <div className="flex flex-col gap-8">{[6, 7, 8, 9, 10, 11].map((i) => monthShelf(i, "right"))}</div>

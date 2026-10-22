@@ -404,6 +404,15 @@ La propietaria declara que los registros de v1 en Supabase **eran solo pruebas, 
 
 **Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
 
+### DEC-055 — Ramas bajo el tronco, adornos entre libros y letreros de mes (ajusta DEC-053 y DEC-054)
+**Estado:** APROBADA · **Fecha de aprobación:** 21/10/2026
+
+1. **Ramas:** el tronco queda por encima de las ramas-repisa, y estas entran bajo él para que no se noten como imágenes separadas.
+2. **Adornos:** pueden ir al inicio, entre los libros o al final de la repisa, y hay hasta dos (2 con 0–2 libros, 1 con 3–5, ninguno con más), con posiciones estables por repisa.
+3. **Meses:** el nombre de cada repisa es un letrero de madera colgado de dos clavos, en tipografía Sacramento.
+
+**Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
+
 ## 6. Decisiones todavía pendientes (no aprobadas)
 
 Estado vigente al **19/10/2026**: ninguna OPEN/TECH se cierra por completo. DEC-033–DEC-041 resuelven subreglas concretas; las partes restantes siguen pendientes y bloquean solo las tareas que dependen de ellas:
