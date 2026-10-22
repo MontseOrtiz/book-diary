@@ -394,6 +394,16 @@ La propietaria declara que los registros de v1 en Supabase **eran solo pruebas, 
 
 **Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
 
+### DEC-054 — Árbol armado con tronco y ramas-repisa ilustrados; ramas del hero más chicas en móvil (sustituye el árbol de DEC-053)
+**Estado:** APROBADA · **Fecha de aprobación:** 21/10/2026
+
+1. **Tronco:** `Trunk.png` se corta en copa, tramo liso y base; el tramo liso se estira, así que el árbol crece con el contenido sin deformar copa ni base.
+2. **Repisas:** `Branch_Shelf_*.png` son la tabla de cada fila de libros (una imagen por fila), en escritorio y en móvil. El tocón queda del lado del tronco.
+3. **Archivos:** versiones optimizadas (WebP) en `public/tree/`; los PNG originales siguen en `public/landing/`.
+4. **Hero en móvil:** las ramas de cerezo se reducen en pantallas angostas.
+
+**Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
+
 ## 6. Decisiones todavía pendientes (no aprobadas)
 
 Estado vigente al **19/10/2026**: ninguna OPEN/TECH se cierra por completo. DEC-033–DEC-041 resuelven subreglas concretas; las partes restantes siguen pendientes y bloquean solo las tareas que dependen de ellas:

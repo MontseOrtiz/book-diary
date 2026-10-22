@@ -71,9 +71,9 @@ function Spine({
 }
 
 const SIDE_PADDING = {
-  left: "md:pl-[84px] md:pr-5",
-  right: "md:pl-5 md:pr-[84px]",
-  top: "md:px-[84px]",
+  left: "pl-8 pr-14 md:pl-10 md:pr-[70px]",
+  right: "pl-14 pr-8 md:pl-[70px] md:pr-10",
+  top: "px-8 md:px-10",
 } as const;
 
 function Shelf({
@@ -94,15 +94,20 @@ function Shelf({
   onSelect: (entry: LibraryEntry, trigger: HTMLElement) => void;
 }) {
   return (
-    <section aria-labelledby={id} className="min-w-0" data-shelf={side ? id : undefined} data-side={side}>
+    <section
+      aria-labelledby={id}
+      className={`min-w-0 ${side ? "shelf-art" : ""}`}
+      data-shelf={side ? id : undefined}
+      data-side={side}
+      data-plank={side ? { left: "l", right: "r", top: "t" }[side] : undefined}
+    >
       <h3 id={id} className="mb-2 font-serif text-xl">
         {title}
       </h3>
       <div
         data-books
-        data-art={side ? "" : undefined}
-        className={`shelf-planks flex flex-nowrap items-end gap-x-1 overflow-x-auto md:flex-wrap md:overflow-visible ${side ? SIDE_PADDING[side] : ""}`}
-        style={{ rowGap: GAP, paddingBottom: GAP, minHeight: ROW + GAP }}
+        className={`${side ? "" : "shelf-planks"} flex flex-nowrap items-end gap-x-1 overflow-x-auto md:flex-wrap md:overflow-visible ${side ? SIDE_PADDING[side] : ""}`}
+        style={{ rowGap: GAP, paddingBottom: side ? 56 : GAP, minHeight: ROW + GAP + (side ? 30 : 0) }}
       >
         {entries.length ? (
           entries.map((entry) => (
@@ -277,7 +282,7 @@ export function LibraryTree({
             onSelect={select}
           />
 
-          <div data-grid className="grid gap-8 md:grid-cols-[1fr_96px_1fr]">
+          <div data-grid className="grid gap-8 md:grid-cols-[1fr_64px_1fr]">
             <div className="flex flex-col gap-8">{[0, 1, 2, 3, 4, 5].map((i) => monthShelf(i, "left"))}</div>
             <div aria-hidden="true" className="hidden md:block" />
             <div className="flex flex-col gap-8">{[6, 7, 8, 9, 10, 11].map((i) => monthShelf(i, "right"))}</div>

@@ -51,7 +51,9 @@ function Scene({ progress }: { progress: MutableRefObject<number> }) {
   // Láminas de rama a pantalla completa (cover), alineadas a su esquina superior:
   // el borde exterior siempre coincide con el margen de la pantalla.
   const near = visibleSize(OVERLAY_DIST, aspect);
-  const branchH = Math.max(near.height, near.width / BRANCH_ASPECT);
+  // En pantallas angostas (móvil) las ramas se encogen para no tapar la fachada.
+  const branchScale = MathUtils.clamp(aspect / 1.2, 0.4, 1);
+  const branchH = Math.max(near.height, near.width / BRANCH_ASPECT) * branchScale;
   const branchW = branchH * BRANCH_ASPECT;
   const closedX = -near.width / 2 + branchW / 2;
   const openX = closedX - branchW * BRANCH_SHIFT;

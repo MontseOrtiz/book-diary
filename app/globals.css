@@ -115,12 +115,38 @@ body:has([data-intro-playing]) .site-nav {
   }
 }
 
-/* Tabla de cada fila de la repisa. En escritorio la dibujan las ramas del árbol. */
+/* Tabla de cada fila de las repisas sin árbol (sin mes, abandonados). */
 .shelf-planks {
   background-image: repeating-linear-gradient(to bottom, transparent 0 150px, #8a6a55 150px 164px);
 }
-@media (min-width: 768px) {
-  .shelf-planks[data-art] {
-    background-image: none !important;
-  }
+
+/* Repisas del árbol: una rama ilustrada por fila (164px = alto de fila + separación).
+   Se dibuja en la sección, no en el contenedor con scroll, para que no se corte ni se mueva.
+   top = alto del título (36px) + 75px (la cara superior de la rama queda a 75px del borde de la imagen). */
+.shelf-art {
+  position: relative;
+  isolation: isolate;
+}
+.shelf-art::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: 111px;
+  bottom: -40px;
+  background-repeat: repeat-y;
+  background-size: 100% 164px;
+  pointer-events: none;
+}
+.shelf-art[data-plank="l"]::before {
+  background-image: url(/tree/plank-l.webp);
+}
+.shelf-art[data-plank="r"]::before {
+  background-image: url(/tree/plank-r.webp);
+}
+.shelf-art[data-plank="t"]::before {
+  background-image: url(/tree/plank-l.webp), url(/tree/plank-r.webp);
+  background-size: 50% 164px, 50% 164px;
+  background-position: 0 0, 100% 0;
 }
