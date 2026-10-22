@@ -413,6 +413,17 @@ La propietaria declara que los registros de v1 en Supabase **eran solo pruebas, 
 
 **Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
 
+### DEC-056 — Ramas alineadas por fila, letreros en los extremos, repisa única en móvil y favicon (ajusta DEC-054 y DEC-055)
+**Estado:** APROBADA · **Fecha de aprobación:** 21/10/2026
+
+1. **Alineación:** en escritorio, cada fila de la cuadrícula une un mes de la izquierda con uno de la derecha (Enero–Julio, Febrero–Agosto, …), así sus ramas quedan a la misma altura y se juntan bajo el tronco.
+2. **Letreros:** el letrero del mes va en el extremo de su rama: a la izquierda en las ramas izquierdas y a la derecha en las derechas.
+3. **Móvil:** «Actualmente leyendo» es una sola rama; se oculta la barra de desplazamiento de las repisas y las repisas vacías muestran un solo adorno.
+4. **Adornos:** se suman `Bookmark-icon.png` y `Lantern-icon.png`.
+5. **Favicon:** `portrait-icon.png` (`app/icon.png`); se elimina el favicon por defecto.
+
+**Motivo:** pedido de la propietaria. **Documentos afectados:** `docs/DECISIONS.md` (§6).
+
 ## 6. Decisiones todavía pendientes (no aprobadas)
 
 Estado vigente al **19/10/2026**: ninguna OPEN/TECH se cierra por completo. DEC-033–DEC-041 resuelven subreglas concretas; las partes restantes siguen pendientes y bloquean solo las tareas que dependen de ellas:

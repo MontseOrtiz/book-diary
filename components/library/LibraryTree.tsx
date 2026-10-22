@@ -23,6 +23,8 @@ const DECOR_ICONS = [
   { src: "/landing/Watercolor-Globe-Icon.png", drop: 0.069 },
   { src: "/landing/ceramic-bouquete-icon.png", drop: 0.074 },
   { src: "/landing/portrait-icon.png", drop: 0.206 },
+  { src: "/landing/Bookmark-icon.png", drop: 0.053 },
+  { src: "/landing/Lantern-icon.png", drop: 0.061 },
 ];
 const DECOR_SIZE = 96;
 // Los libros y adornos se hunden un poco tras la cara de la rama, que va por delante.
@@ -112,6 +114,7 @@ function Shelf({
   entries,
   empty,
   side,
+  row,
   selectedId,
   onSelect,
 }: {
@@ -120,27 +123,34 @@ function Shelf({
   entries: LibraryEntry[];
   empty?: string;
   side?: "left" | "right" | "top";
+  /** Fila de la cuadrícula en escritorio: Enero y Julio comparten fila, así sus ramas quedan alineadas. */
+  row?: number;
   selectedId: string | null;
   onSelect: (entry: LibraryEntry, trigger: HTMLElement) => void;
 }) {
   return (
     <section
       aria-labelledby={id}
-      className={`min-w-0 ${side ? "shelf-art" : ""}`}
+      className={`min-w-0 ${side ? "shelf-art" : ""} ${
+        side === "left" ? "md:col-start-1" : side === "right" ? "md:col-start-3" : ""
+      } ${row ? "md:[grid-row-start:var(--row)]" : ""}`}
+      style={row ? ({ "--row": row } as React.CSSProperties) : undefined}
       data-shelf={side ? id : undefined}
       data-side={side}
       data-plank={side ? { left: "l", right: "r", top: "t" }[side] : undefined}
     >
-      <h3 id={id} className="mb-2 h-7">
+      <h3 id={id} className={`mb-2 h-7 ${side === "right" ? "text-right" : ""}`}>
         <span className="month-sign">{title}</span>
       </h3>
       <div
         data-books
-        className={`${side ? "" : "shelf-planks"} flex flex-nowrap items-end gap-x-1 overflow-x-auto md:flex-wrap md:overflow-visible ${side ? SIDE_PADDING[side] : ""}`}
+        className={`${side ? "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden" : "shelf-planks"} flex flex-nowrap items-end gap-x-1 overflow-x-auto md:flex-wrap md:overflow-visible ${side ? SIDE_PADDING[side] : ""}`}
         style={{ rowGap: GAP, paddingBottom: side ? 56 : GAP, minHeight: ROW + GAP + (side ? 30 : 0) }}
       >
         {!entries.length && (
-          <p className="self-center pl-2 text-sm text-ink-soft">{empty ?? "Sin lecturas este mes."}</p>
+          <p className="shrink-0 self-center whitespace-nowrap pl-2 text-xs text-ink-soft md:text-sm">
+            {empty ?? "Sin lecturas este mes."}
+          </p>
         )}
         {withDecor(id, entries, Boolean(side)).map((item) =>
           item.kind === "book" ? (
@@ -158,7 +168,7 @@ function Shelf({
               aria-hidden="true"
               width={DECOR_SIZE}
               height={DECOR_SIZE}
-              className="mx-1 shrink-0 self-end object-contain"
+              className={`mx-1 shrink-0 self-end object-contain ${item.key !== "decor-0" && !entries.length ? "max-md:hidden" : ""}`}
               style={{ width: DECOR_SIZE, height: DECOR_SIZE, transform: `translateY(${Math.round(item.icon.drop * DECOR_SIZE) + SINK}px)` }}
             />
           ),
@@ -287,13 +297,14 @@ export function LibraryTree({
   }, [selection]);
 
   const selectedId = selection?.entry.reading.id ?? null;
-  const monthShelf = (index: number, side: "left" | "right") => (
+  const monthShelf = (index: number, side: "left" | "right", row: number) => (
     <Shelf
       key={MONTH_NAMES[index]}
       id={`mes-${index}`}
       title={MONTH_NAMES[index]}
       entries={months[index]}
       side={side}
+      row={row}
       selectedId={selectedId}
       onSelect={select}
     />
@@ -314,10 +325,9 @@ export function LibraryTree({
             onSelect={select}
           />
 
-          <div data-grid className="grid gap-8 md:grid-cols-[1fr_24px_1fr]">
-            <div className="flex flex-col gap-8">{[0, 1, 2, 3, 4, 5].map((i) => monthShelf(i, "left"))}</div>
-            <div aria-hidden="true" className="hidden md:block" />
-            <div className="flex flex-col gap-8">{[6, 7, 8, 9, 10, 11].map((i) => monthShelf(i, "right"))}</div>
+          <div data-grid className="grid gap-x-0 gap-y-8 md:grid-cols-[1fr_24px_1fr]">
+            {[0, 1, 2, 3, 4, 5].map((i) => monthShelf(i, "left", i + 1))}
+            {[6, 7, 8, 9, 10, 11].map((i) => monthShelf(i, "right", i - 5))}
           </div>
         </div>
         <div aria-hidden="true" className="hidden h-16 md:block" />

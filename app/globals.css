@@ -138,18 +138,30 @@ body:has([data-intro-playing]) .site-nav {
   background-size: 100% 164px;
   pointer-events: none;
 }
+@media (min-width: 768px) {
+  .shelf-art[data-plank="l"]::before {
+    right: -24px; /* el tocón entra bajo el tronco */
+  }
+  .shelf-art[data-plank="r"]::before {
+    left: -24px;
+  }
+}
 .shelf-art[data-plank="l"]::before {
-  right: -24px; /* el tocón entra bajo el tronco */
   background-image: url(/tree/plank-l.webp);
 }
 .shelf-art[data-plank="r"]::before {
-  left: -24px;
   background-image: url(/tree/plank-r.webp);
 }
+/* Móvil: una sola rama. Escritorio: una a cada lado del tronco. */
 .shelf-art[data-plank="t"]::before {
-  background-image: url(/tree/plank-l.webp), url(/tree/plank-r.webp);
-  background-size: 50% 164px, 50% 164px;
-  background-position: 0 0, 100% 0;
+  background-image: url(/tree/plank-l.webp);
+}
+@media (min-width: 768px) {
+  .shelf-art[data-plank="t"]::before {
+    background-image: url(/tree/plank-l.webp), url(/tree/plank-r.webp);
+    background-size: 50% 164px, 50% 164px;
+    background-position: 0 0, 100% 0;
+  }
 }
 
 /* Letrero de mes colgado de la pared: dos clavos, dos cuerdas y una tabla de madera.
