@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { Newsreader, Work_Sans } from "next/font/google";
+import { Gayathri, Sacramento } from "next/font/google";
+import { Navbar } from "@/components/Navbar";
 import "./globals.css";
 
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
+const sacramento = Sacramento({
+  variable: "--font-sacramento",
   subsets: ["latin"],
-  style: ["normal", "italic"],
+  weight: "400",
 });
 
-const workSans = Work_Sans({
-  variable: "--font-work-sans",
+const gayathri = Gayathri({
+  variable: "--font-gayathri",
   subsets: ["latin"],
+  weight: ["100", "400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -26,9 +28,10 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${newsreader.variable} ${workSans.variable} h-full antialiased`}
+      className={`${sacramento.variable} ${gayathri.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-ink font-sans">
+        <Navbar />
         {children}
       </body>
     </html>

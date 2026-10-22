@@ -1,0 +1,2 @@
+-- Synthetic local-only data. Never replace with personal or production data.
+-- The v2 tests seed their own rows inside a rolled-back transaction.

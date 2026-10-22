@@ -32,8 +32,9 @@
   --color-error: var(--error);
   --color-info: var(--info);
 
-  --font-serif: var(--font-newsreader);
-  --font-sans: var(--font-work-sans);
+  --font-display: var(--font-sacramento);
+  --font-serif: var(--font-gayathri);
+  --font-sans: var(--font-gayathri);
 }
 
 body {
@@ -41,17 +42,23 @@ body {
   color: var(--text-primary);
 }
 
+/* El navbar espera a que termine la animación de entrada. */
+body:has([data-intro-playing]) .site-nav {
+  opacity: 0;
+  visibility: hidden;
+}
+
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-surface transition-all hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex text-center items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-surface transition-all hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-primary/25 bg-surface px-5 py-2.5 text-sm font-medium text-ink transition-all hover:bg-surface-soft active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex text-center items-center justify-center gap-2 rounded-xl border border-primary/25 bg-surface px-5 py-2.5 text-sm font-medium text-ink transition-all hover:bg-surface-soft active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-ghost {
-    @apply text-sm font-medium text-ink-soft underline underline-offset-2 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-50;
+    @apply text-center text-sm font-medium text-ink-soft underline underline-offset-2 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .card-surface {
@@ -84,4 +91,108 @@ body {
   .alert-success {
     @apply flex items-start gap-2 rounded-xl border-l-4 border-success bg-success/10 px-4 py-2.5 text-sm text-ink;
   }
+}
+
+@layer components {
+  .field {
+    @apply rounded-lg border border-ink-soft/30 bg-surface px-3 py-2 text-sm text-ink;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes cover-in {
+    from {
+      transform: perspective(600px) rotateY(-80deg);
+      opacity: 0;
+    }
+    to {
+      transform: perspective(600px) rotateY(0);
+      opacity: 1;
+    }
+  }
+  .cover-in {
+    animation: cover-in 0.5s ease-out;
+  }
+}
+
+/* Tabla de cada fila de las repisas sin árbol (sin mes, abandonados). */
+.shelf-planks {
+  background-image: repeating-linear-gradient(to bottom, transparent 0 150px, #8a6a55 150px 164px);
+}
+
+/* Repisas del árbol: una rama ilustrada por fila (164px = alto de fila + separación).
+   Se dibuja en la sección, no en el contenedor con scroll, para que no se corte ni se mueva.
+   top = alto del título (36px) + 75px (la cara superior de la rama queda a 75px del borde de la imagen). */
+.shelf-art {
+  position: relative;
+}
+.shelf-art::before {
+  content: "";
+  position: absolute;
+  z-index: 1; /* encima de libros y adornos, debajo del tronco (z 2) */
+  left: 0;
+  right: 0;
+  top: 111px;
+  bottom: -40px;
+  background-repeat: repeat-y;
+  background-size: 100% 164px;
+  pointer-events: none;
+}
+@media (min-width: 768px) {
+  .shelf-art[data-plank="l"]::before {
+    right: -24px; /* el tocón entra bajo el tronco */
+  }
+  .shelf-art[data-plank="r"]::before {
+    left: -24px;
+  }
+}
+.shelf-art[data-plank="l"]::before {
+  background-image: url(/tree/plank-l.webp);
+}
+.shelf-art[data-plank="r"]::before {
+  background-image: url(/tree/plank-r.webp);
+}
+/* Móvil: una sola rama. Escritorio: una a cada lado del tronco. */
+.shelf-art[data-plank="t"]::before {
+  background-image: url(/tree/plank-l.webp);
+}
+@media (min-width: 768px) {
+  .shelf-art[data-plank="t"]::before {
+    background-image: url(/tree/plank-l.webp), url(/tree/plank-r.webp);
+    background-size: 50% 164px, 50% 164px;
+    background-position: 0 0, 100% 0;
+  }
+}
+
+/* Letrero de mes colgado de la pared: dos clavos, dos cuerdas y una tabla de madera.
+   Mide 28px de alto para no mover el resto de la repisa. */
+.month-sign {
+  position: relative;
+  display: inline-block;
+  padding: 0 1rem;
+  font-family: var(--font-sacramento), cursive;
+  font-size: 1.9rem;
+  line-height: 26px;
+  color: var(--text-primary);
+  background: linear-gradient(to bottom, #f3e0c1, #e6c9a0);
+  border: 1px solid #b58a5c;
+  border-radius: 6px;
+  box-shadow: 0 2px 3px rgb(90 60 40 / 0.25);
+}
+.month-sign::before,
+.month-sign::after {
+  content: "";
+  position: absolute;
+  top: -15px;
+  width: 5px;
+  height: 15px;
+  background:
+    radial-gradient(circle at 50% 2.5px, #5b4038 2.5px, transparent 3px),
+    linear-gradient(to right, transparent 2px, #8a6a55 2px 3px, transparent 3px);
+}
+.month-sign::before {
+  left: 18%;
+}
+.month-sign::after {
+  right: 18%;
 }
